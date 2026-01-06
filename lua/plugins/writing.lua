@@ -27,14 +27,4 @@ return {
 			-- Query synonyms (without replacing)
 		end,
 	},
-
-	-- Word count
-	{
-		"vimpostor/vim-tpipeline", -- Works with tmux
-		ft = { "markdown", "text", "latex" },
-		config = function()
-			vim.g.tpipeline_wordcount = 1
-			vim.g.tpipeline_autoembed = 0
-		end,
-	},
 }

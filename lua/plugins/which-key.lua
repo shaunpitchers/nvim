@@ -48,6 +48,8 @@ return {
 				{ "<leader>l", group = "[L]aTeX" },
 				{ "<leader>t", group = "[T]oggle" },
 				{ "<leader>r", group = "[R]ename" },
+				{ "<leader>m", group = "[M]arkdown" },
+				{ "<leader>h", group = "[H]tml" },
 			},
 		},
 		config = function(_, opts)

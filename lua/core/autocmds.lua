@@ -268,3 +268,38 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		})
 	end,
 })
+
+-- Minimal distraction-free writing toggle (no ZenMode plugin)
+local function toggle_distraction_free()
+	local b = vim.b
+
+	if not b._df then
+		b._df = {
+			number = vim.wo.number,
+			relativenumber = vim.wo.relativenumber,
+			signcolumn = vim.wo.signcolumn,
+			showmode = vim.o.showmode,
+			laststatus = vim.o.laststatus,
+			cmdheight = vim.o.cmdheight,
+		}
+
+		vim.wo.number = false
+		vim.wo.relativenumber = false
+		vim.wo.signcolumn = "no"
+		vim.o.showmode = false
+		vim.o.laststatus = 0
+		vim.o.cmdheight = 0
+		vim.cmd("setlocal scrolloff=999")
+	else
+		vim.wo.number = b._df.number
+		vim.wo.relativenumber = b._df.relativenumber
+		vim.wo.signcolumn = b._df.signcolumn
+		vim.o.showmode = b._df.showmode
+		vim.o.laststatus = b._df.laststatus
+		vim.o.cmdheight = b._df.cmdheight
+		vim.cmd("setlocal scrolloff&")
+		b._df = nil
+	end
+end
+
+vim.keymap.set("n", "<leader>zz", toggle_distraction_free, { desc = "Toggle distraction-free" })

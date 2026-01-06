@@ -42,11 +42,9 @@ require("lazy").setup({
 	{ import = "plugins.git" },
 
 	-- UI components
-	{ import = "plugins.ui" },
 	{ import = "plugins.which-key" },
 
 	-- Writing components
-	{ import = "plugins.markdown" },
 	{ import = "plugins.writing" },
 }, {
 	install = { colorscheme = { "vim" } },
