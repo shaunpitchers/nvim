@@ -96,6 +96,7 @@ vim.g.netrw_dirhistmax = 0 -- no directory history clutter
 
 -- Define diagnostic signs
 vim.diagnostic.config({
+	virtual_text = false, -- no inline clutter
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = " ",
@@ -104,6 +105,9 @@ vim.diagnostic.config({
 			[vim.diagnostic.severity.INFO] = " ",
 		},
 	},
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
 })
 
 -- Classic statusline behaviour
