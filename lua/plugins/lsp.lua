@@ -37,7 +37,7 @@ return {
 					"pyright",
 					"ruff",
 					"lua_ls",
-					"sylua",
+					"stylua",
 					"bashls",
 					"marksman",
 					"jsonls",
