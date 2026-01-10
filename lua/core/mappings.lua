@@ -122,7 +122,7 @@ map(
 --------------
 -- File Explorer
 --------------
-map("n", "<leader>e", ":Ex<CR>", { desc = "Open File Explorer" })
+map("n", "<leader>e", ":Lexplore<CR>", { desc = "Open File Explorer" })
 
 -- Macro management
 map("n", "<leader>ql", "<cmd>reg<CR>", { desc = "List macros (registers)" })

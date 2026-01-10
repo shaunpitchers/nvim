@@ -46,25 +46,8 @@ require("lazy").setup({
 
 	-- Writing components
 	{ import = "plugins.writing" },
+	-- { import = "plugins.zettelkasten" },
 }, {
-	install = { colorscheme = { "vim" } },
-	ui = {
-		border = "rounded",
-		icons = {
-			cmd = "⌘",
-			config = "🛠",
-			event = "📅",
-			ft = "📂",
-			init = "⚙",
-			keys = "🗝",
-			plugin = "🔌",
-			runtime = "💻",
-			source = "📄",
-			start = "🚀",
-			task = "📌",
-			lazy = "💤 ",
-		},
-	},
 	performance = {
 		rtp = {
 			disabled_plugins = {
@@ -95,15 +78,6 @@ end, 0)
 -- Configure Python path
 vim.g.python3_host_prog = vim.fn.exepath("python3") or vim.fn.exepath("python")
 
--- Initial health check
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		safe_require("core.health").check()
-	end,
-	once = true,
-	desc = "Initial dependency check",
-})
-
 -- LSP notifications
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
@@ -113,8 +87,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 vim.deprecate = function() end -- Disables all deprecation warnings
-
-vim.g.netrw_banner = 0 -- Remove banner
-vim.g.netrw_liststyle = 3 -- Tree-style view
-vim.g.netrw_browse_split = 0 -- Reuse current window
-vim.g.netrw_winsize = 25 -- Split size

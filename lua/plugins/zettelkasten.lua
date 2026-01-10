@@ -2,8 +2,8 @@
 return {
 	-- No plugin dependency; this is just a "config-only" module for lazy.nvim
 	-- If you prefer, you can move the config() body into after/plugin/zettelkasten.lua
-	-- lazy = false,
-	-- priority = 900,
+	lazy = false,
+	priority = 900,
 	config = function()
 		local uv = vim.uv or vim.loop
 

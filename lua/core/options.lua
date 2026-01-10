@@ -86,6 +86,16 @@ vim.diagnostic.config({
 	},
 })
 
+-- netrw: behave like a left-side file tree
+vim.g.netrw_banner = 0 -- no help banner
+vim.g.netrw_liststyle = 3 -- tree view
+vim.g.netrw_browse_split = 4 -- open in a vertical split
+vim.g.netrw_winsize = 25 -- width in percent
+vim.g.netrw_altv = 1 -- split to the LEFT
+vim.g.netrw_keepdir = 0 -- follow directory changes
+vim.g.netrw_localrmdir = "rm -r"
+vim.g.netrw_dirhistmax = 0 -- no directory history clutter
+
 -- Define diagnostic signs
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 for type, icon in pairs(signs) do
