@@ -31,7 +31,7 @@ map("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 map("n", "<leader>bf", "<cmd>bfirst<CR>", { desc = "First buffer" })
 map("n", "<leader>bl", "<cmd>blast<CR>", { desc = "Last buffer" })
 -- Quick file navigation
-map("n", "<leader>be", "<cmd>e ", { desc = "Open file in current buffer" }) -- Type filename after
+map("n", "<leader>be", "<cmd>e ", { desc = "Open file in current buffer" })  -- Type filename after
 map("n", "<leader>bE", "<cmd>e %:h/", { desc = "Open file in current dir" }) -- Type filename after
 
 --------------
