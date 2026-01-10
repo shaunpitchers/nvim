@@ -67,7 +67,7 @@ require("lazy").setup({
 })
 
 -- Vim-like defaults: keep the builtin look
-pcall(vim.cmd.colorscheme, "vim")
+pcall(vim.cmd.colorscheme, "industry")
 
 -- Load keymaps after plugins
 vim.defer_fn(function()
