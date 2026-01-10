@@ -29,6 +29,8 @@ return {
 					"json",
 					"yaml",
 					"toml",
+					"html",
+					"css",
 				},
 				auto_install = true, -- installs missing parsers when you open a filetype
 				highlight = {

@@ -1,226 +1,163 @@
 return {
-    {
-        "williamboman/mason.nvim",
-        build = ":MasonUpdate",
-        cmd = "Mason",
-        config = function()
-            require("mason").setup({
-                ui = {
-                    border = "rounded",
-                    icons = {
-                        package_installed = "✓",
-                        package_pending = "➜",
-                        package_uninstalled = "✗",
-                    },
-                },
-            })
+	-- Mason: installer UI only (no auto-install bloat here)
+	{
+		"williamboman/mason.nvim",
+		build = ":MasonUpdate",
+		cmd = "Mason",
+		config = function()
+			require("mason").setup({
+				ui = {
+					border = "rounded",
+					icons = {
+						package_installed = "✓",
+						package_pending = "➜",
+						package_uninstalled = "✗",
+					},
+				},
+			})
+		end,
+	},
 
-            -- List of packages to auto-install
-            local packages = {
-                -- Python
-                "pyright", -- Python LSP
-                "ruff",    -- Python linter
-                "debugpy", -- Python debugger
-                "black",   -- Python formatter
-                "isort",   -- Python import sorter
+	-- Mason-lspconfig: the *only* place we ensure servers
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		opts = function()
+			local lspconfig = require("lspconfig")
+			local util = require("lspconfig.util")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-                -- Lua
-                "lua-language-server",
-                "stylua",
+			-- (Optional) some setups need this for clangd; harmless otherwise
+			capabilities.offsetEncoding = { "utf-8" }
 
-                -- JavaScript/TypeScript
-                "typescript-language-server",
-                "prettier",
-                "eslint-lsp",
+			return {
+				automatic_installation = true,
+				ensure_installed = {
+					-- your actual use-cases
+					"pyright",
+					"ruff",
+					"lua_ls",
+					"sylua",
+					"bashls",
+					"marksman",
+					"jsonls",
+					"yamlls",
+					"texlab",
+				},
 
-                -- Bash
-                "bash-language-server",
-                "shellcheck",
+				handlers = {
+					-- default for anything else you manually install later
+					function(server_name)
+						lspconfig[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
 
-                -- Docker
-                "dockerfile-language-server",
+					-- Python
+					pyright = function()
+						lspconfig.pyright.setup({
+							capabilities = capabilities,
+							root_dir = util.root_pattern("pyproject.toml", "setup.py", ".git"),
+							settings = {
+								python = {
+									analysis = {
+										typeCheckingMode = "basic",
+										autoSearchPaths = true,
+										diagnosticMode = "workspace",
+										useLibraryCodeForTypes = true,
+									},
+								},
+							},
+						})
+					end,
 
-                -- JSON/YAML
-                "json-lsp",
-                "yaml-language-server",
+					-- Ruff (linter). Keep hover off so Pyright owns hover docs.
+					ruff = function()
+						lspconfig.ruff.setup({
+							capabilities = capabilities,
+							init_options = {
+								settings = {
+									args = { "--ignore=E501" },
+								},
+							},
+							on_attach = function(client)
+								client.server_capabilities.hoverProvider = false
+							end,
+						})
+					end,
 
-                -- Markdown
-                "marksman",
+					-- Lua (for your nvim config)
+					lua_ls = function()
+						lspconfig.lua_ls.setup({
+							capabilities = capabilities,
+							settings = {
+								Lua = {
+									runtime = { version = "LuaJIT" },
+									diagnostics = { globals = { "vim" } },
+									workspace = { checkThirdParty = false },
+									telemetry = { enable = false },
+								},
+							},
+						})
+					end,
 
-                -- C/C++
-                "clangd",
-                "cpptools",
+					-- Markdown
+					marksman = function()
+						lspconfig.marksman.setup({
+							capabilities = capabilities,
+							filetypes = { "markdown", "markdown.mdx" },
+						})
+					end,
 
-                --foam-ls
-                "foam-language-server",
+					-- Shell
+					bashls = function()
+						lspconfig.bashls.setup({
+							capabilities = capabilities,
+							filetypes = { "sh", "zsh", "bash" },
+						})
+					end,
 
-                -- Latex
-                "texlab"
-            }
+					-- JSON/YAML (config files)
+					jsonls = function()
+						lspconfig.jsonls.setup({ capabilities = capabilities })
+					end,
 
-            -- Auto-install packages on startup
-            vim.schedule(function()
-                local mr = require("mason-registry")
-                for _, pkg in ipairs(packages) do
-                    local ok, p = pcall(mr.get_package, pkg)
-                    if ok and not p:is_installed() then
-                        p:install()
-                    end
-                end
-            end)
-        end,
-    },
+					yamlls = function()
+						lspconfig.yamlls.setup({ capabilities = capabilities })
+					end,
+				},
+			}
+		end,
+	},
 
-    {
-        "williamboman/mason-lspconfig.nvim",
-        dependencies = { "williamboman/mason.nvim" },
-        opts = function()
-            local lspconfig = require("lspconfig")
-            local util = require("lspconfig.util")
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
-            capabilities.offsetEncoding = { "utf-8" }
+	-- LSP keymaps (stable + small)
+	{
+		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local bufnr = args.buf
+					local opts = { buffer = bufnr }
 
-            return {
-                automatic_installation = true,
-                ensure_installed = { "pyright", "ruff", "lua_ls", "marksman" },
-                handlers = {
-                    -- Default handler for any installed server without a custom config
-                    function(server_name)
-                        lspconfig[server_name].setup({
-                            capabilities = capabilities,
-                            on_attach = function() end,
-                        })
-                    end,
+					-- If you keep lsp_signature, attach it; if not, no crash.
+					local ok, sig = pcall(require, "lsp_signature")
+					if ok then
+						sig.on_attach({
+							bind = true,
+							hint_enable = false,
+							floating_window = true,
+							handler_opts = { border = "rounded" },
+						}, bufnr)
+					end
 
-                    -- Pyright (Python)
-                    pyright = function()
-                        lspconfig.pyright.setup({
-                            capabilities = capabilities,
-                            on_attach = function() end,
-                            root_dir = util.root_pattern("pyproject.toml", "setup.py", ".git"),
-                            settings = {
-                                python = {
-                                    analysis = {
-                                        typeCheckingMode = "basic",
-                                        autoSearchPaths = true,
-                                        diagnosticMode = "workspace",
-                                        useLibraryCodeForTypes = true,
-                                    },
-                                },
-                            },
-                        })
-                    end,
-
-                    -- Ruff (Python Linter)
-                    ruff = function()
-                        lspconfig.ruff.setup({
-                            capabilities = capabilities,
-                            init_options = {
-                                settings = {
-                                    args = { "--ignore=E501" },
-                                },
-                            },
-                            on_attach = function(client, _)
-                                client.server_capabilities.hoverProvider = false
-                            end,
-                        })
-                    end,
-
-                    -- Lua LS
-                    lua_ls = function()
-                        lspconfig.lua_ls.setup({
-                            capabilities = capabilities,
-                            on_attach = function() end,
-                            settings = {
-                                Lua = {
-                                    runtime = { version = "LuaJIT" },
-                                    diagnostics = { globals = { "vim" } },
-                                    workspace = { checkThirdParty = false },
-                                    telemetry = { enable = false },
-                                },
-                            },
-                        })
-                    end,
-
-                    -- Marksman (Markdown)
-                    marksman = function()
-                        lspconfig.marksman.setup({
-                            capabilities = capabilities,
-                            on_attach = function(_, bufnr)
-                                vim.keymap.set("n", "<leader>md", vim.lsp.buf.definition,
-                                    { buffer = bufnr, desc = "Markdown Go to Definition" })
-                                vim.keymap.set("n", "<leader>ml", vim.lsp.buf.rename,
-                                    { buffer = bufnr, desc = "Markdown Rename" })
-                            end,
-                            filetypes = { "markdown", "markdown.mdx" },
-                        })
-                    end,
-
-                    -- Bash
-                    bashls = function()
-                        lspconfig.bashls.setup({
-                            capabilities = capabilities,
-                            on_attach = function() end,
-
-                            filetypes = { "sh", "zsh", "bash" },
-                        })
-                    end,
-
-                    -- C/C++ (Clangd)
-                    clangd = function()
-                        lspconfig.clangd.setup({
-                            capabilities = capabilities,
-                            on_attach = function() end,
-
-                            cmd = { "clangd", "--background-index" },
-                        })
-                    end,
-                },
-            }
-        end,
-    },
-
-    {
-        "neovim/nvim-lspconfig",
-        event = { "BufReadPre", "BufNewFile" },
-        config = function()
-            -- Keymaps and capabilities setup
-            --local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-
-            vim.api.nvim_create_autocmd("LspAttach", {
-                callback = function(args)
-                    local bufnr = args.buf
-
-                    -- Attach lsp_signature
-                    require("lsp_signature").on_attach({
-                        bind = true,
-                        hint_enable = false,
-                        floating_window = true,
-                        handler_opts = { border = "rounded" },
-                    }, bufnr)
-
-                    -- General LSP mappings
-                    local opts = { buffer = bufnr }
-                    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-                    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-                    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-                end,
-            })
-
-
-            -- -- Auto-start marksman for markdown files
-            -- vim.api.nvim_create_autocmd("FileType", {
-            --     pattern = "markdown",
-            --     callback = function()
-            --         if not require("lspconfig").marksman.manager then
-            --             require("lspconfig").marksman.vim.lsp.buff_add()
-            --         end
-            --     end,
-            -- })
-        end,
-    },
-
-
+					-- Core mappings (you already use these)
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				end,
+			})
+		end,
+	},
 }

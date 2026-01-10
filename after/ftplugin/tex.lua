@@ -55,6 +55,22 @@ local function latex_build()
 	})
 end
 
+-- open compiled pdf
+local function open_pdf_in_st()
+	local pdf = vim.fn.expand("%:p:r") .. ".pdf"
+	-- Run zathura from st in a separate DWM window
+	-- -e: run command
+	vim.fn.jobstart({ "st", "-e", "sh", "-lc", "zathura " .. vim.fn.shellescape(pdf) }, { detach = true })
+end
+
+vim.keymap.set("n", "<leader>lp", open_pdf_in_st, { buffer = true, desc = "LaTeX: open PDF (st + zathura)" })
+
+vim.keymap.set("n", "<leader>lc", function()
+	local dir = vim.fn.expand("%:p:h")
+	vim.fn.jobstart({ "latexmk", "-c" }, { cwd = dir, detach = true })
+	vim.notify("LaTeX: cleaned aux files")
+end, { buffer = true, desc = "LaTeX: clean" })
+
 -- Important: make autocmd buffer-local so it doesn't duplicate
 vim.api.nvim_clear_autocmds({ group = group, buffer = 0 })
 vim.api.nvim_create_autocmd("BufWritePost", {

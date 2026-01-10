@@ -9,7 +9,6 @@ local function safe_require(name)
 end
 
 -- Load core configs with error handling
-
 safe_require("core.options")
 safe_require("core.autocmds")
 
@@ -34,14 +33,14 @@ require("lazy").setup({
 	{ import = "plugins.lsp" },
 	{ import = "plugins.cmp" },
 	-- IDE enhancements
-	{ import = "plugins.ide" },
+	-- { import = "plugins.ide" },
 	{ import = "plugins.treesitter" },
 
 	-- Editor enhancements
 	{ import = "plugins.editor" },
 	{ import = "plugins.git" },
 
-	-- UI components
+	-- Which-key, keybindings enhancements
 	{ import = "plugins.which-key" },
 
 	-- Writing components
@@ -78,12 +77,12 @@ end, 0)
 -- Configure Python path
 vim.g.python3_host_prog = vim.fn.exepath("python3") or vim.fn.exepath("python")
 
--- LSP notifications
-vim.api.nvim_create_autocmd("LspAttach", {
-	callback = function(args)
-		local client = vim.lsp.get_client_by_id(args.data.client_id)
-		vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
-	end,
-})
+-- -- LSP notifications
+-- vim.api.nvim_create_autocmd("LspAttach", {
+-- 	callback = function(args)
+-- 		local client = vim.lsp.get_client_by_id(args.data.client_id)
+-- 		vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
+-- 	end,
+-- })
 
-vim.deprecate = function() end -- Disables all deprecation warnings
+-- vim.deprecate = function() end -- Disables all deprecation warnings

@@ -36,63 +36,7 @@ autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
 	command = "checktime",
 })
 
--- Filetype specific settings
-augroup("filetype_settings", { clear = true })
-autocmd("FileType", {
-	group = "filetype_settings",
-	pattern = { "markdown", "text" },
-	callback = function()
-		vim.opt_local.wrap = true
-		vim.opt_local.linebreak = true
-		vim.opt_local.spell = true
-	end,
-})
-
--- Python specific settings
-augroup("python_settings", { clear = true })
-autocmd("FileType", {
-	group = "python_settings",
-	pattern = "python",
-	callback = function()
-		vim.opt_local.colorcolumn = "88"
-		vim.opt_local.shiftwidth = 4
-	end,
-})
-
--- Force .py to be a Python filetype
-vim.api.nvim_create_autocmd("BufRead", {
-	pattern = "*.py",
-	callback = function()
-		vim.bo.filetype = "python" -- Override incorrect filetype
-	end,
-})
-
----@type rainbow_delimiters.config
-vim.g.rainbow_delimiters = {
-	strategy = {
-		[""] = "rainbow-delimiters.strategy.global",
-		vim = "rainbow-delimiters.strategy.local",
-	},
-	query = {
-		[""] = "rainbow-delimiters",
-		lua = "rainbow-blocks",
-	},
-	priority = {
-		[""] = 110,
-		lua = 210,
-	},
-	highlight = {
-		"RainbowDelimiterRed",
-		"RainbowDelimiterYellow",
-		"RainbowDelimiterBlue",
-		"RainbowDelimiterOrange",
-		"RainbowDelimiterGreen",
-		"RainbowDelimiterViolet",
-		"RainbowDelimiterCyan",
-	},
-}
--- Spell settings: enable for writing buffers, disable for code buffers
-
+-- Run command for common languages
 vim.api.nvim_create_user_command("Run", function()
 	local ft = vim.bo.filetype
 	local fname = vim.fn.expand("%")
@@ -170,8 +114,8 @@ vim.api.nvim_create_autocmd("FileType", {
 			vim.opt_local.spelllang = "en_gb"
 			vim.opt_local.textwidth = 80
 			vim.opt_local.formatoptions:append({ "t" }) -- auto wrap while typing
-			vim.opt.thesaurus = ".config/nvim/thesaurus/mthesaur.txt"
-
+			-- vim.opt.thesaurus = ".config/nvim/thesaurus/mthesaur.txt"
+			vim.opt_local.thesaurus = vim.fn.expand("~/.config/nvim/thesaurus/mthesaur.txt")
 			return
 		end
 

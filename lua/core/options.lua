@@ -6,9 +6,6 @@ vim.g.have_nerd_font = true
 -- Set encoding to UTF-8
 vim.opt.encoding = "utf-8"
 
--- Enable airline powerline fonts
-vim.g.airline_powerline_fonts = 1
-
 -- Bracket matching
 vim.opt.showmatch = true
 vim.opt.matchtime = 1
@@ -64,6 +61,7 @@ vim.opt.sidescrolloff = 8
 
 -- Folding
 vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 

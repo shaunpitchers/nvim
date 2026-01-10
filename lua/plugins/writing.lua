@@ -4,10 +4,8 @@ return {
 		ft = { "text", "markdown", "tex", "mail", "gitcommit" }, -- only load for writing buffers
 		init = function()
 			-- Prefer local backends (fast, offline). You can add online later.
-			vim.g.tq_enabled_backends = { "openoffice_en", "mthesaur_txt" }
 			vim.g.tq_mthesaur_file = vim.fn.expand("~/.config/nvim/thesaurus/mthesaur.txt")
 			vim.g.tq_enabled_backends = { "mthesaur_txt" }
-			vim.g.tq_openoffice_en_file = vim.fn.expand("~/.config/nvim/thesaurus/mythes/th_en_US_new")
 			vim.g.tq_truncation_on_definition_num = 3
 			vim.g.tq_truncation_on_syno_list_size = 40
 

@@ -4,10 +4,6 @@ if not ok then
 	builtin = nil
 end
 
--- Set leader keys
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
 --------------
 -- Essentials
 --------------
@@ -64,10 +60,10 @@ end, { desc = "Format" })
 map("n", "<leader>ci", "<cmd>LspInfo<CR>", { desc = "LSP info" })
 
 -- LSP range code action (visual mode)
-map("v", "<leader>ca", "<ESC><cmd>lua vim.lsp.buf.range_code_action()<CR>", { desc = "Code action (range)" })
+-- map("v", "<leader>ca", "<ESC><cmd>lua vim.lsp.buf.range_code_action()<CR>", { desc = "Code action (range)" })
 
 -- treesitter-refactor
---vim.keymap.set("n", "<leader>rr", ":TSRename<CR>", { desc = "TS Smart Rename" })
+vim.keymap.set("n", "<leader>rr", ":TSRename<CR>", { desc = "TS Smart Rename" })
 
 -- Diagnostic navigation
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
@@ -110,16 +106,6 @@ map("n", "<leader>gr", "<cmd>Gread<CR>", { desc = "Git revert to HEAD" })
 map("n", "<leader>gw", "<cmd>Gwrite<CR>", { desc = "Git stage file" })
 
 --------------
--- Comments
---------------
-map(
-	"v",
-	"<leader>/",
-	"<ESC><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>",
-	{ desc = "Toggle comment" }
-)
-
---------------
 -- File Explorer
 --------------
 map("n", "<leader>e", ":Lexplore<CR>", { desc = "Open File Explorer" })
@@ -145,45 +131,6 @@ map("n", "<leader>cd", "<cmd>lcd %:p:h<CR>", { desc = "CD to file dir" })
 ------------
 vim.keymap.set("i", "<C-d>", "<C-x><C-k>", { desc = "Dictionary completion" })
 
---------------
---Latex
---------------
-
-local function open_pdf_in_st()
-	local pdf = vim.fn.expand("%:p:r") .. ".pdf"
-	-- Run zathura from st in a separate DWM window
-	-- -e: run command
-	vim.fn.jobstart({ "st", "-e", "sh", "-lc", "zathura " .. vim.fn.shellescape(pdf) }, { detach = true })
-end
-
-vim.keymap.set("n", "<leader>lp", open_pdf_in_st, { buffer = true, desc = "LaTeX: open PDF (st + zathura)" })
-
-vim.keymap.set("n", "<leader>lc", function()
-	local dir = vim.fn.expand("%:p:h")
-	vim.fn.jobstart({ "latexmk", "-c" }, { cwd = dir, detach = true })
-	vim.notify("LaTeX: cleaned aux files")
-end, { buffer = true, desc = "LaTeX: clean" })
-
 vim.keymap.set("n", "<leader>ts", function()
 	vim.opt_local.spell = not vim.opt_local.spell:get()
 end, { desc = "Toggle spell" })
-
-vim.api.nvim_create_user_command("WritingToggle", function()
-	local b = vim.b
-	if not b._writing then
-		b._writing = {
-			spell = vim.opt_local.spell:get(),
-			textwidth = vim.opt_local.textwidth:get(),
-		}
-		vim.opt_local.spell = true
-		vim.opt_local.spelllang = "en_gb"
-		vim.opt_local.textwidth = 80
-		vim.opt_local.formatoptions:append("t")
-	else
-		vim.opt_local.spell = b._writing.spell
-		vim.opt_local.textwidth = b._writing.textwidth
-		b._writing = nil
-	end
-end, {})
-
-vim.keymap.set("n", "<leader>tw", "<cmd>WritingToggle<CR>", { desc = "Toggle writing mode" })
