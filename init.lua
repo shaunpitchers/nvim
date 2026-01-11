@@ -67,7 +67,7 @@ require("lazy").setup({
 })
 
 -- Vim-like defaults: keep the builtin look
-pcall(vim.cmd.colorscheme, "industry")
+pcall(vim.cmd.colorscheme, "vim")
 
 -- Load keymaps after plugins
 vim.defer_fn(function()
@@ -77,12 +77,10 @@ end, 0)
 -- Configure Python path
 vim.g.python3_host_prog = vim.fn.exepath("python3") or vim.fn.exepath("python")
 
--- -- LSP notifications
--- vim.api.nvim_create_autocmd("LspAttach", {
--- 	callback = function(args)
--- 		local client = vim.lsp.get_client_by_id(args.data.client_id)
--- 		vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
--- 	end,
--- })
-
--- vim.deprecate = function() end -- Disables all deprecation warnings
+-- LSP notifications
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(args)
+		local client = vim.lsp.get_client_by_id(args.data.client_id)
+		vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
+	end,
+})
