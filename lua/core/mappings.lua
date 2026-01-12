@@ -119,9 +119,9 @@ map("n", "<leader>qe", function()
 	print("Cleared register @" .. r)
 end, { desc = "Clear register (press register key)" })
 
--- scp netrw connection to workstation86
+-- scp netrw connection to workstation84
 vim.keymap.set("n", "<leader>rd", function()
-	local host = "workstation86"
+	local host = "workstation84"
 	if path == "" then
 		return
 	end
