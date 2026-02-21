@@ -45,7 +45,6 @@ require("lazy").setup({
 
 	-- Writing components
 	{ import = "plugins.writing" },
-	-- { import = "plugins.zettelkasten" },
 }, {
 	performance = {
 		rtp = {
