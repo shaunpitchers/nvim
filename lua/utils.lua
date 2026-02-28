@@ -38,14 +38,26 @@ function M.root(markers, startpath)
 end
 
 ---Start an async job with buffered stdout/stderr and a simple notification.
----@param cmd string[] command + args
----@param opts table? { cwd=string, on_exit=function(code, signal), title=string, success=string, failure=string }
+---
+---Notes:
+---  - cmd can be a list (preferred) or a shell string.
+---  - Some tools use non-zero exit codes for "non-error" states (e.g. pytest exit 5 = no tests collected).
+---    Use opts.ok_exit_codes to treat those as success.
+---@param cmd string[]|string command + args, or a shell string
+---@param opts table? { cwd=string, on_exit=function(code, signal), title=string, success=string, failure=string, ok_exit_codes=integer[] }
 function M.job(cmd, opts)
   opts = opts or {}
   if type(cmd) == "string" then
     cmd = { "sh", "-lc", cmd }
   end
   local title = opts.title or table.concat(cmd, " ")
+  local ok = {}
+  ok[0] = true
+  if type(opts.ok_exit_codes) == "table" then
+    for _, c in ipairs(opts.ok_exit_codes) do
+      ok[c] = true
+    end
+  end
   return vim.fn.jobstart(cmd, {
     cwd = opts.cwd,
     stdout_buffered = true,
@@ -54,7 +66,7 @@ function M.job(cmd, opts)
       if opts.on_exit then
         pcall(opts.on_exit, code, signal)
       end
-      if code == 0 then
+      if ok[code] then
         if opts.success then
           vim.notify(opts.success, vim.log.levels.INFO, { title = title })
         end

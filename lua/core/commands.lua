@@ -95,7 +95,19 @@ vim.api.nvim_create_user_command("Test", function(opts)
     vim.notify(err or "No :Test rule", vim.log.levels.WARN)
     return
   end
-  U.job(spec.cmd, { cwd = spec.cwd, title = spec.title, success = "Test OK" })
+  U.job(spec.cmd, {
+    cwd = spec.cwd,
+    title = spec.title,
+    ok_exit_codes = spec.ok_exit_codes,
+    success = nil,
+    on_exit = function(code, _)
+      if code == 0 then
+        vim.notify("Test OK", vim.log.levels.INFO, { title = spec.title })
+      elseif code == 5 and spec.title and spec.title:match("pytest") then
+        vim.notify("No tests collected", vim.log.levels.WARN, { title = spec.title })
+      end
+    end,
+  })
 end, { nargs = "?" })
 
 

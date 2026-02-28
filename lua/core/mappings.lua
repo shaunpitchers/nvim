@@ -31,9 +31,9 @@ end
 --------------
 map("n", "gd", vim.lsp.buf.definition, { desc = "Goto definition" })
 map("n", "gr", vim.lsp.buf.references, { desc = "Goto references" })
--- map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
+map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
 
-map("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename all in buffer" })
+map("n", "<leader>rr", vim.lsp.buf.rename, { desc = "Rename all in buffer" })
 map("n", "<leader>cf", function()
 	vim.lsp.buf.format({ async = true })
 end, { desc = "Format" })
@@ -51,9 +51,6 @@ map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 -- Git
 --------------
 
--- Gitsigns
--- map("n", "<leader>gj", "<cmd>Gitsigns next_hunk<cr>", { desc = "Next hunk" })
--- map("n", "<leader>gk", "<cmd>Gitsigns prev_hunk<cr>", { desc = "Prev hunk" })
 -- vim-fugitive
 map("n", "<leader>gs", "<cmd>Git<CR>", { desc = "Git status" })
 map("n", "<leader>gd", "<cmd>Gdiffsplit<CR>", { desc = "Git diff" })
@@ -99,35 +96,33 @@ vim.keymap.set("n", "<leader>t", function()
 	vim.opt_local.spell = not vim.opt_local.spell:get()
 end, { desc = "Toggle spell" })
 
-
 --------------
 -- Toggles
 --------------
 local function toggle_wrap()
-  vim.wo.wrap = not vim.wo.wrap
-  vim.notify("Wrap: " .. (vim.wo.wrap and "ON" or "OFF"), vim.log.levels.INFO)
+	vim.wo.wrap = not vim.wo.wrap
+	vim.notify("Wrap: " .. (vim.wo.wrap and "ON" or "OFF"), vim.log.levels.INFO)
 end
 
 local function toggle_spell()
-  vim.wo.spell = not vim.wo.spell
-  vim.notify("Spell: " .. (vim.wo.spell and "ON" or "OFF"), vim.log.levels.INFO)
+	vim.wo.spell = not vim.wo.spell
+	vim.notify("Spell: " .. (vim.wo.spell and "ON" or "OFF"), vim.log.levels.INFO)
 end
 
 local function toggle_numbers()
-  -- cycle: number -> relativenumber -> off
-  if vim.wo.number and not vim.wo.relativenumber then
-    vim.wo.relativenumber = true
-  elseif vim.wo.number and vim.wo.relativenumber then
-    vim.wo.number = false
-    vim.wo.relativenumber = false
-  else
-    vim.wo.number = true
-    vim.wo.relativenumber = false
-  end
+	-- cycle: number -> relativenumber -> off
+	if vim.wo.number and not vim.wo.relativenumber then
+		vim.wo.relativenumber = true
+	elseif vim.wo.number and vim.wo.relativenumber then
+		vim.wo.number = false
+		vim.wo.relativenumber = false
+	else
+		vim.wo.number = true
+		vim.wo.relativenumber = false
+	end
 end
 
 map("n", "<leader>tw", toggle_wrap, { desc = "Toggle wrap" })
 map("n", "<leader>ts", toggle_spell, { desc = "Toggle spell" })
 map("n", "<leader>tn", toggle_numbers, { desc = "Toggle line numbers" })
 map("n", "<leader>?", "<cmd>Leader<cr>", { desc = "Show <leader> mappings" })
-

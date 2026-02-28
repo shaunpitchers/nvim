@@ -284,9 +284,10 @@ function M.test_spec(opts)
   if ft == "python" then
     if has("pytest") then
       if arg == "file" then
-        return { cmd = { "pytest", "-q", vim.fn.expand("%") }, cwd = root, title = "pytest (file)" }
+        return { cmd = { "pytest", "-q", vim.fn.expand("%") }, cwd = root, title = "pytest (file)", ok_exit_codes = { 5 } }
       end
-      return { cmd = { "pytest", "-q" }, cwd = root, title = "pytest" }
+      -- pytest exit code 5 means "no tests collected"; treat it as a non-error.
+      return { cmd = { "pytest", "-q" }, cwd = root, title = "pytest", ok_exit_codes = { 5 } }
     end
     -- fallback to unittest discovery
     return { cmd = { "python3", "-m", "unittest", "discover" }, cwd = root, title = "unittest discover" }
