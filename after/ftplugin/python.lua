@@ -11,12 +11,6 @@ vim.opt_local.colorcolumn = "89" -- optional; delete if you dislike
 -- Don't auto-wrap code while typing (manual gq is still available)
 vim.opt_local.formatoptions:remove({ "t", "c", "r", "o" })
 
--- Enable Tree-sitter folding for Python (if available)
--- Folding is window-local, so use vim.wo / setlocal
-vim.wo.foldmethod = "expr"
-vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.wo.foldlevel = 99 -- start unfolded; set 0 if you prefer folded
-vim.wo.foldenable = true
 
 -- --------------
 -- Format on save

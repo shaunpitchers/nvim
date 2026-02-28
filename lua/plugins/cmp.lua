@@ -80,7 +80,7 @@ return {
   -- Snippets only for writing filetypes
   {
     "L3MON4D3/LuaSnip",
-    ft = { "tex", "markdown" },
+    ft = { "tex", "plaintex", "markdown", "html", "css", "python" },
     build = "make install_jsregexp",
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
@@ -95,6 +95,15 @@ return {
 
       -- load friendly-snippets lazily
       require("luasnip.loaders.from_vscode").lazy_load()
+
+      -- load your personal Lua snippets (kept small + intentional)
+      require("luasnip.loaders.from_lua").lazy_load({
+        paths = { vim.fn.stdpath("config") .. "/snippets" },
+      })
+
+      -- Treat tex as latex for snippet purposes
+      luasnip.filetype_extend("tex", { "latex" })
+      luasnip.filetype_extend("plaintex", { "latex" })
 
       -- When LuaSnip loads, also enable the cmp snippet source
       local ok, cmp = pcall(require, "cmp")
