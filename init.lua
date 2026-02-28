@@ -1,6 +1,12 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
+pcall(function()
+  if vim.loader and vim.loader.enable then
+    vim.loader.enable()
+  end
+end)
+
 -- Error handling wrapper for requires
 local function safe_require(name)
 	local ok, mod = pcall(require, name)
@@ -53,6 +59,10 @@ require("lazy").setup({
 				"tohtml",
 				"tutor",
 				"zipPlugin",
+				"gzip",
+				"getscript",
+				"getscriptPlugin",
+				"logipat",
 			},
 		},
 	},
@@ -76,10 +86,16 @@ end, 0)
 -- Configure Python path
 vim.g.python3_host_prog = vim.fn.exepath("python3") or vim.fn.exepath("python")
 
--- LSP notifications
+-- Optional LSP attach notifications (disable by default for less noise)
+vim.g.lsp_attach_notify = vim.g.lsp_attach_notify or false
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
+		if not vim.g.lsp_attach_notify then
+			return
+		end
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
-		vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
+		if client then
+			vim.notify(string.format("LSP: %s attached", client.name), vim.log.levels.INFO)
+		end
 	end,
 })

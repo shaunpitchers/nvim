@@ -88,6 +88,17 @@ vim.api.nvim_create_user_command("Clean", function()
   U.job(spec.cmd, { cwd = spec.cwd, title = spec.title, success = "Clean OK" })
 end, {})
 
+
+vim.api.nvim_create_user_command("Test", function(opts)
+  local spec, err = B.test_spec({ arg = opts.args })
+  if not spec then
+    vim.notify(err or "No :Test rule", vim.log.levels.WARN)
+    return
+  end
+  U.job(spec.cmd, { cwd = spec.cwd, title = spec.title, success = "Test OK" })
+end, { nargs = "?" })
+
+
 vim.api.nvim_create_user_command("Open", function(opts)
   local ft = vim.bo.filetype
   local file = vim.fn.expand("%:p")
@@ -125,6 +136,50 @@ vim.api.nvim_create_user_command("Open", function(opts)
   vim.notify("No opener found (install zathura or xdg-open)", vim.log.levels.WARN)
 end, { nargs = "?" })
 
+
+
+-- Mapping help (replacement for which-key): :Leader and :LocalLeader
+local function open_map_help(title, lines)
+  vim.cmd("new")
+  vim.bo.buftype = "nofile"
+  vim.bo.bufhidden = "wipe"
+  vim.bo.swapfile = false
+  vim.bo.modifiable = true
+  vim.api.nvim_buf_set_name(0, title)
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+  vim.bo.modifiable = false
+  vim.bo.filetype = "help"
+  vim.wo.wrap = false
+end
+
+local function collect_maps(mode, leader, maps)
+  local out = {}
+  for _, m in ipairs(maps) do
+    if m.lhs and m.lhs:sub(1, #leader) == leader then
+      local rhs = m.desc or m.rhs or ""
+      table.insert(out, string.format("%-14s %s", m.lhs, rhs))
+    end
+  end
+  table.sort(out)
+  if #out == 0 then
+    out = { "No mappings found." }
+  end
+  return out
+end
+
+vim.api.nvim_create_user_command("Leader", function()
+  local leader = vim.g.mapleader or "\\"
+  local maps = vim.api.nvim_get_keymap("n")
+  open_map_help("Leader mappings", collect_maps("n", leader, maps))
+end, {})
+
+vim.api.nvim_create_user_command("LocalLeader", function()
+  local leader = vim.g.maplocalleader or ","
+  local maps = vim.api.nvim_buf_get_keymap(0, "n")
+  open_map_help("LocalLeader mappings", collect_maps("n", leader, maps))
+end, {})
+
 vim.keymap.set("n", "<leader>xr", "<cmd>Run<CR>", { desc = "Execute: run", nowait = true })
 vim.keymap.set("n", "<leader>xb", "<cmd>Build<CR>", { desc = "Execute: build", nowait = true })
 vim.keymap.set("n", "<leader>xo", "<cmd>Open<CR>", { desc = "Execute: open", nowait = true })
+vim.keymap.set("n", "<leader>xt", "<cmd>Test<CR>", { desc = "Execute: test", nowait = true })

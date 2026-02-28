@@ -10,6 +10,7 @@ end
 map("<localleader>b", "<cmd>Build<cr>", "Build")
 map("<localleader>r", "<cmd>Run<cr>", "Run")
 map("<localleader>o", "<cmd>Open<cr>", "Open")
+map("<localleader>t", "<cmd>Test<cr>", "Test")
 map("<localleader>c", "<cmd>Clean<cr>", "Clean")
 
 ------------------------------------------------------------------

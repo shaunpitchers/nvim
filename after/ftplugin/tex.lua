@@ -7,34 +7,34 @@ local B = require("core.build")
 
 -- Build lock (buffer-local) to avoid overlaps on frequent saves.
 if vim.b.build_running == nil then
-	vim.b.build_running = false
+  vim.b.build_running = false
 end
 
 local group = U.augroup("TexBuildOnSave", false)
 
 local function build_on_save()
-	if vim.b.build_running then
-		return
-	end
-	vim.b.build_running = true
-	B.build_current_job({
-		success = "LaTeX: build OK",
-		failure = "LaTeX: build FAILED (see :messages)",
-		on_exit = function()
-			vim.b.build_running = false
-		end,
-	})
+  if vim.b.build_running then
+    return
+  end
+  vim.b.build_running = true
+  B.build_current_job({
+    success = "LaTeX: build OK",
+    failure = "LaTeX: build FAILED (see :messages)",
+    on_exit = function()
+      vim.b.build_running = false
+    end,
+  })
 end
 
 vim.api.nvim_clear_autocmds({ group = group, buffer = 0 })
 vim.api.nvim_create_autocmd("BufWritePost", {
-	group = group,
-	buffer = 0,
-	callback = build_on_save,
+  group = group,
+  buffer = 0,
+  callback = build_on_save,
 })
 
 local map = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
+  vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
 end
 
 -- Filetype-local execution keys

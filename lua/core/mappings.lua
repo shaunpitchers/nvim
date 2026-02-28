@@ -98,3 +98,36 @@ vim.keymap.set("i", "<C-d>", "<C-x><C-k>", { desc = "Dictionary completion" })
 vim.keymap.set("n", "<leader>t", function()
 	vim.opt_local.spell = not vim.opt_local.spell:get()
 end, { desc = "Toggle spell" })
+
+
+--------------
+-- Toggles
+--------------
+local function toggle_wrap()
+  vim.wo.wrap = not vim.wo.wrap
+  vim.notify("Wrap: " .. (vim.wo.wrap and "ON" or "OFF"), vim.log.levels.INFO)
+end
+
+local function toggle_spell()
+  vim.wo.spell = not vim.wo.spell
+  vim.notify("Spell: " .. (vim.wo.spell and "ON" or "OFF"), vim.log.levels.INFO)
+end
+
+local function toggle_numbers()
+  -- cycle: number -> relativenumber -> off
+  if vim.wo.number and not vim.wo.relativenumber then
+    vim.wo.relativenumber = true
+  elseif vim.wo.number and vim.wo.relativenumber then
+    vim.wo.number = false
+    vim.wo.relativenumber = false
+  else
+    vim.wo.number = true
+    vim.wo.relativenumber = false
+  end
+end
+
+map("n", "<leader>tw", toggle_wrap, { desc = "Toggle wrap" })
+map("n", "<leader>ts", toggle_spell, { desc = "Toggle spell" })
+map("n", "<leader>tn", toggle_numbers, { desc = "Toggle line numbers" })
+map("n", "<leader>?", "<cmd>Leader<cr>", { desc = "Show <leader> mappings" })
+

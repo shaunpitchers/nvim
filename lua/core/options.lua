@@ -31,6 +31,7 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
 vim.opt.undofile = true
 vim.opt.completeopt = { "menuone", "noselect", "noinsert" }
+vim.opt.shortmess:append("c") -- don't show completion messages
 
 -- Indentation (defaults; filetype plugins may override)
 vim.opt.tabstop = 4
@@ -39,6 +40,8 @@ vim.opt.softtabstop = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.opt.breakindent = true
+vim.opt.linebreak = true
+vim.opt.showbreak = "↳ "
 
 -- Search
 vim.opt.ignorecase = true
