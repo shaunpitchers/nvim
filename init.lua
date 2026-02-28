@@ -1,3 +1,6 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
+
 -- Error handling wrapper for requires
 local function safe_require(name)
 	local ok, mod = pcall(require, name)
@@ -11,6 +14,7 @@ end
 -- Load core configs with error handling
 safe_require("core.options")
 safe_require("core.autocmds")
+safe_require("core.commands")
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -29,11 +33,10 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup plugins with lazy.nvim
 require("lazy").setup({
 	-- Core functionality
-	{ import = "plugins.telescope" },
+	-- { import = "plugins.telescope" },
 	{ import = "plugins.lsp" },
 	{ import = "plugins.cmp" },
 	-- IDE enhancements
-	-- { import = "plugins.ide" },
 	{ import = "plugins.treesitter" },
 
 	-- Editor enhancements
@@ -41,10 +44,7 @@ require("lazy").setup({
 	{ import = "plugins.git" },
 
 	-- Which-key, keybindings enhancements
-	{ import = "plugins.which-key" },
-
-	-- Writing components
-	{ import = "plugins.writing" },
+	-- { import = "plugins.which-key" },
 }, {
 	performance = {
 		rtp = {
@@ -66,7 +66,7 @@ require("lazy").setup({
 })
 
 -- Vim-like defaults: keep the builtin look
-pcall(vim.cmd.colorscheme, "vim")
+pcall(vim.cmd.colorscheme, "industry")
 
 -- Load keymaps after plugins
 vim.defer_fn(function()

@@ -50,6 +50,8 @@ return {
 				{ "<leader>r", group = "[R]ename" },
 				{ "<leader>m", group = "[M]arkdown" },
 				{ "<leader>h", group = "[H]tml" },
+				{ "<leader>x", group = "e[X]ecute" },
+				{ "<leader>z", group = "[Z]en" },
 			},
 		},
 		config = function(_, opts)

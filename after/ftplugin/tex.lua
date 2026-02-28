@@ -1,80 +1,43 @@
 -- ~/.config/nvim/after/ftplugin/tex.lua
--- LaTeX: latexmk build on save (no overlap) + writing settings
+-- LaTeX: build on save + localleader build/run/open/clean.
+-- Build/Clean/Open are centralized in lua/core/build.lua and lua/core/commands.lua.
 
--- Writing-friendly settings
-vim.opt_local.spell = true
-vim.opt_local.spelllang = "en_gb"
-vim.opt_local.textwidth = 80
-vim.opt_local.formatoptions:append({ "t" })
-vim.opt_local.wrap = true
-vim.opt_local.linebreak = true
-vim.opt_local.breakindent = true
+local U = require("utils")
+local B = require("core.build")
 
--- Build lock (buffer-local)
-if vim.b.latex_build_running == nil then
-	vim.b.latex_build_running = false
+-- Build lock (buffer-local) to avoid overlaps on frequent saves.
+if vim.b.build_running == nil then
+	vim.b.build_running = false
 end
 
-local group = vim.api.nvim_create_augroup("LatexBuildOnSave", { clear = false })
+local group = U.augroup("TexBuildOnSave", false)
 
-local function latex_build()
-	if vim.b.latex_build_running then
+local function build_on_save()
+	if vim.b.build_running then
 		return
 	end
-
-	local file = vim.fn.expand("%:p")
-	if file == "" then
-		return
-	end
-
-	vim.b.latex_build_running = true
-	local dir = vim.fn.expand("%:p:h")
-
-	vim.fn.jobstart({
-		"latexmk",
-		"-pdf",
-		"-quiet",
-		"-bibtex",
-		"-pdflatex=pdflatex -interaction=nonstopmode -synctex=1 -file-line-error",
-		"-f",
-		file,
-	}, {
-		cwd = dir,
-		stdout_buffered = true,
-		stderr_buffered = true,
-
-		-- Always release the lock
-		on_exit = function(_, code)
-			vim.b.latex_build_running = false
-			if code == 0 then
-				vim.notify("LaTeX: build OK", vim.log.levels.INFO)
-			else
-				vim.notify("LaTeX: build FAILED (see :messages)", vim.log.levels.ERROR)
-			end
+	vim.b.build_running = true
+	B.build_current_job({
+		success = "LaTeX: build OK",
+		failure = "LaTeX: build FAILED (see :messages)",
+		on_exit = function()
+			vim.b.build_running = false
 		end,
 	})
 end
 
--- open compiled pdf
-local function open_pdf_in_st()
-	local pdf = vim.fn.expand("%:p:r") .. ".pdf"
-	-- Run zathura from st in a separate DWM window
-	-- -e: run command
-	vim.fn.jobstart({ "st", "-e", "sh", "-lc", "zathura " .. vim.fn.shellescape(pdf) }, { detach = true })
-end
-
-vim.keymap.set("n", "<leader>lp", open_pdf_in_st, { buffer = true, desc = "LaTeX: open PDF (st + zathura)" })
-
-vim.keymap.set("n", "<leader>lc", function()
-	local dir = vim.fn.expand("%:p:h")
-	vim.fn.jobstart({ "latexmk", "-c" }, { cwd = dir, detach = true })
-	vim.notify("LaTeX: cleaned aux files")
-end, { buffer = true, desc = "LaTeX: clean" })
-
--- Important: make autocmd buffer-local so it doesn't duplicate
 vim.api.nvim_clear_autocmds({ group = group, buffer = 0 })
 vim.api.nvim_create_autocmd("BufWritePost", {
 	group = group,
 	buffer = 0,
-	callback = latex_build,
+	callback = build_on_save,
 })
+
+local map = function(lhs, rhs, desc)
+	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
+end
+
+-- Filetype-local execution keys
+map("<localleader>b", "<cmd>Build<cr>", "Build (LaTeX)")
+map("<localleader>o", "<cmd>Open<cr>", "Open PDF")
+map("<localleader>c", "<cmd>Clean<cr>", "Clean aux")

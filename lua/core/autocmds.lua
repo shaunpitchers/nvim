@@ -36,25 +36,6 @@ autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
 	command = "checktime",
 })
 
--- Run command for common languages
-vim.api.nvim_create_user_command("Run", function()
-	local ft = vim.bo.filetype
-	local fname = vim.fn.expand("%")
-
-	local cmd = ({
-		python = "python3 " .. fname,
-		lua = "lua " .. fname,
-		sh = "bash " .. fname,
-		c = "gcc " .. fname .. " && ./a.out",
-	})[ft]
-
-	if cmd then
-		vim.cmd("split | terminal " .. cmd)
-	else
-		print("No run command for filetype: " .. ft)
-	end
-end, {})
-
 -- Spell settings: enable for writing buffers, disable for code buffers
 
 local aug = vim.api.nvim_create_augroup("SpellControl", { clear = true })
@@ -113,6 +94,9 @@ vim.api.nvim_create_autocmd("FileType", {
 			vim.opt_local.spell = true
 			vim.opt_local.spelllang = "en_gb"
 			vim.opt_local.textwidth = 80
+			vim.opt_local.wrap = true
+			vim.opt_local.linebreak = true
+			vim.opt_local.breakindent = true
 			vim.opt_local.formatoptions:append({ "t" }) -- auto wrap while typing
 			-- vim.opt.thesaurus = ".config/nvim/thesaurus/mthesaur.txt"
 			vim.opt_local.thesaurus = vim.fn.expand("~/.config/nvim/thesaurus/mthesaur.txt")
@@ -207,6 +191,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			group = fmt,
 			buffer = bufnr,
 			callback = function()
+				if vim.b[bufnr].format_on_save == false then
+					return
+				end
 				vim.lsp.buf.format({ bufnr = bufnr, async = false })
 			end,
 		})

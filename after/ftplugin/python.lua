@@ -21,27 +21,12 @@ vim.wo.foldenable = true
 -- --------------
 -- Format on save
 -- --------------
--- Enable by default for Python buffers. If you ever want to disable for a buffer:
--- :lua vim.b.format_on_save = false
+-- Formatting is handled globally in lua/core/autocmds.lua.
+-- For Python, enable by default; disable per-buffer with:
+--   :lua vim.b.format_on_save = false
 if vim.b.format_on_save == nil then
 	vim.b.format_on_save = true
 end
-
-local group = vim.api.nvim_create_augroup("PythonFormatOnSave", { clear = false })
-vim.api.nvim_clear_autocmds({ group = group, buffer = 0 })
-vim.api.nvim_create_autocmd("BufWritePre", {
-	group = group,
-	buffer = 0,
-	callback = function()
-		if not vim.b.format_on_save then
-			return
-		end
-		-- Never let formatting errors break editing/startup
-		pcall(function()
-			vim.lsp.buf.format({ async = false })
-		end)
-	end,
-})
 
 -- ----------------
 -- Pytest commands
@@ -118,3 +103,13 @@ vim.b.match_words = table.concat({
 	"def",
 	"class",
 }, ",")
+
+-- in after/ftplugin/<ft>.lua
+local map = function(lhs, rhs, desc)
+	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
+end
+
+map("<localleader>b", "<cmd>Build<cr>", "Build")
+map("<localleader>r", "<cmd>Run<cr>", "Run")
+map("<localleader>o", "<cmd>Open<cr>", "Open")
+-- map("<localleader>c", "<cmd>Clean<cr>", "Clean") -- optional
