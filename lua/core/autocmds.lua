@@ -93,7 +93,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		if vim.tbl_contains(spell_ft, ft) then
 			vim.opt_local.spell = true
 			vim.opt_local.spelllang = "en_gb"
-			vim.opt_local.textwidth = 80
+			vim.opt_local.textwidth = 88
 			vim.opt_local.wrap = true
 			vim.opt_local.linebreak = true
 			vim.opt_local.showbreak = "↳ "
