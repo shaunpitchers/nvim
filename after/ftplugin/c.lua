@@ -1,6 +1,6 @@
 -- after/ftplugin/c.lua
 
-local U = require("utils")
+local U = require("core.utils")
 
 local map = function(lhs, rhs, desc)
 	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })

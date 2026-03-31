@@ -2,9 +2,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
 pcall(function()
-  if vim.loader and vim.loader.enable then
-    vim.loader.enable()
-  end
+	if vim.loader and vim.loader.enable then
+		vim.loader.enable()
+	end
 end)
 
 -- Error handling wrapper for requires
@@ -39,18 +39,15 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup plugins with lazy.nvim
 require("lazy").setup({
 	-- Core functionality
-	-- { import = "plugins.telescope" },
 	{ import = "plugins.lsp" },
 	{ import = "plugins.cmp" },
 	-- IDE enhancements
 	{ import = "plugins.treesitter" },
+	{ import = "plugins.ide" },
 
 	-- Editor enhancements
 	{ import = "plugins.editor" },
 	{ import = "plugins.git" },
-
-	-- Which-key, keybindings enhancements
-	-- { import = "plugins.which-key" },
 }, {
 	performance = {
 		rtp = {

@@ -1,4 +1,10 @@
 return {
+
+	{ "junegunn/fzf" },
+	{
+		"junegunn/fzf.vim",
+		dependencies = { "junegunn/fzf" },
+	},
 	-- Function signatures
 	-- {
 	-- 	"ray-x/lsp_signature.nvim",

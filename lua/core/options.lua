@@ -28,10 +28,24 @@ vim.opt.splitbelow = true
 -- Editing
 vim.opt.mouse = "a"
 vim.opt.clipboard = "unnamedplus"
-vim.opt.swapfile = false
-vim.opt.undofile = true
 vim.opt.completeopt = { "menuone", "noselect", "noinsert" }
 vim.opt.shortmess:append("c") -- don't show completion messages
+
+-- backups
+vim.opt.backup = true
+vim.opt.writebackup = true
+vim.opt.backupdir = vim.fn.stdpath("state") .. "/backup//"
+
+-- undo
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.stdpath("state") .. "/undo//"
+
+-- swap
+vim.opt.swapfile = true
+
+-- safe copy behavior
+vim.opt.backupcopy = "auto"
+vim.opt.backupext = "~"
 
 -- Indentation (defaults; filetype plugins may override)
 vim.opt.tabstop = 4

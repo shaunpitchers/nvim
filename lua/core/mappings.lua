@@ -33,7 +33,7 @@ map("n", "gd", vim.lsp.buf.definition, { desc = "Goto definition" })
 map("n", "gr", vim.lsp.buf.references, { desc = "Goto references" })
 map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
 
-map("n", "<leader>rr", vim.lsp.buf.rename, { desc = "Rename all in buffer" })
+map("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename all in buffer" })
 map("n", "<leader>cf", function()
 	vim.lsp.buf.format({ async = true })
 end, { desc = "Format" })
@@ -65,6 +65,9 @@ map("n", "<leader>gw", "<cmd>Gwrite<CR>", { desc = "Git stage file" })
 -- File Explorer
 --------------
 map("n", "<leader>e", ":Lexplore<CR>", { desc = "Open File Explorer" })
+
+map("n", "<leader>sf", ":Files<CR>", { desc = "Fuzzy Find" })
+map("n", "<leader>sg", ":Rg<CR>", { desc = "Live Grep" })
 
 -- Macro management
 map("n", "<leader>ql", "<cmd>reg<CR>", { desc = "List macros (registers)" })
