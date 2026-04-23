@@ -143,7 +143,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end
 
 		-- Only enable if the server supports it
-		if client.supports_method("textDocument/documentHighlight") then
+		if client:supports_method("textDocument/documentHighlight") then
 			local bufnr = args.buf
 
 			-- Trigger highlights on hold
@@ -173,7 +173,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		if not client then
 			return
 		end
-		if not client.supports_method("textDocument/formatting") then
+		if not client:supports_method("textDocument/formatting") then
 			return
 		end
 

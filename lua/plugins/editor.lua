@@ -5,7 +5,6 @@ return {
 		event = "InsertEnter",
 		config = true,
 	},
-	--test
 	{ "tpope/vim-surround" }, -- cs"'< etc.
 	{ "tpope/vim-commentary" }, -- gcc / gc{motion}
 

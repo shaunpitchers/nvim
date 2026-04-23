@@ -37,7 +37,6 @@ return {
 					"pyright",
 					"ruff",
 					"lua_ls",
-					"stylua",
 					"bashls",
 					"marksman",
 					"jsonls",
@@ -138,24 +137,20 @@ return {
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local bufnr = args.buf
-					local opts = { buffer = bufnr }
-
-					-- If you keep lsp_signature, attach it; if not, no crash.
-					local ok, sig = pcall(require, "lsp_signature")
-					if ok then
-						sig.on_attach({
-							bind = true,
-							hint_enable = false,
-							floating_window = true,
-							handler_opts = { border = "rounded" },
-						}, bufnr)
+					local function map(mode, lhs, rhs, desc)
+						vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
 					end
 
-					-- Core mappings (you already use these)
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+					map("n", "gd", vim.lsp.buf.definition, "Goto definition")
+					map("n", "gr", vim.lsp.buf.references, "Goto references")
+					map("n", "K", vim.lsp.buf.hover, "Hover docs")
+					map("n", "<leader>r", vim.lsp.buf.rename, "Rename all in buffer")
+					map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
+					map("x", "<leader>ca", vim.lsp.buf.code_action, "Code action (range)")
+					map("n", "<leader>cf", function()
+						vim.lsp.buf.format({ bufnr = bufnr, async = true })
+					end, "Format")
+					map("n", "<leader>ci", "<cmd>LspInfo<CR>", "LSP info")
 				end,
 			})
 		end,

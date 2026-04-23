@@ -1,8 +1,4 @@
 local map = vim.keymap.set
-local ok, builtin = pcall(require, "telescope.builtin")
-if not ok then
-	builtin = nil
-end
 
 --------------
 -- Navigation
@@ -29,23 +25,10 @@ end
 --------------
 -- LSP
 --------------
-map("n", "gd", vim.lsp.buf.definition, { desc = "Goto definition" })
-map("n", "gr", vim.lsp.buf.references, { desc = "Goto references" })
-map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
-
-map("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename all in buffer" })
-map("n", "<leader>cf", function()
-	vim.lsp.buf.format({ async = true })
-end, { desc = "Format" })
--- LSP info
-map("n", "<leader>ci", "<cmd>LspInfo<CR>", { desc = "LSP info" })
-
--- LSP range code action (visual mode)
-map("v", "<leader>ca", "<ESC><cmd>lua vim.lsp.buf.range_code_action()<CR>", { desc = "Code action (range)" })
-
 -- Diagnostic navigation
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+map("n", "gl", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
 --------------
 -- Git

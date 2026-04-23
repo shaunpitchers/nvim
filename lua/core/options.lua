@@ -87,7 +87,7 @@ vim.opt.spelllang = "en_gb"
 
 -- Diagnostics (keep it readable: no inline virtual_text)
 vim.diagnostic.config({
-	virtual_text = true,
+	virtual_text = false,
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = " ",
