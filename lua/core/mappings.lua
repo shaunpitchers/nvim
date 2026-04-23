@@ -31,6 +31,25 @@ map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 map("n", "gl", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
 --------------
+-- Quickfix
+--------------
+local function qf(cmd)
+	local ok, err = pcall(vim.cmd, cmd)
+	if not ok then
+		vim.notify(err, vim.log.levels.WARN)
+	end
+end
+
+map("n", "]q", function()
+	qf("cnext")
+end, { desc = "Next quickfix" })
+map("n", "[q", function()
+	qf("cprevious")
+end, { desc = "Prev quickfix" })
+map("n", "<leader>co", "<cmd>copen<CR>", { desc = "Open quickfix" })
+map("n", "<leader>cc", "<cmd>cclose<CR>", { desc = "Close quickfix" })
+
+--------------
 -- Git
 --------------
 
@@ -73,6 +92,14 @@ end, { desc = "Browse workstation84 via scp (netrw)" })
 -- Change working directory
 map("n", "<leader>cd", "<cmd>lcd %:p:h<CR>", { desc = "CD to file dir" })
 
+--------------
+-- Execution
+--------------
+map("n", "<leader>xb", "<cmd>Build<CR>", { desc = "Execute: build" })
+map("n", "<leader>xr", "<cmd>Run<CR>", { desc = "Execute: run" })
+map("n", "<leader>xo", "<cmd>Open<CR>", { desc = "Execute: open" })
+map("n", "<leader>xt", "<cmd>Test<CR>", { desc = "Execute: test" })
+
 ------------
 ---Writing
 ------------
@@ -111,4 +138,6 @@ end
 map("n", "<leader>tw", toggle_wrap, { desc = "Toggle wrap" })
 map("n", "<leader>ts", toggle_spell, { desc = "Toggle spell" })
 map("n", "<leader>tn", toggle_numbers, { desc = "Toggle line numbers" })
+map("n", "<leader>tf", "<cmd>ToggleFormatOnSave<CR>", { desc = "Toggle format on save" })
+map("n", "<leader>th", "<cmd>ToggleInlayHints<CR>", { desc = "Toggle inlay hints" })
 map("n", "<leader>?", "<cmd>Leader<cr>", { desc = "Show <leader> mappings" })

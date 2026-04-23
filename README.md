@@ -47,6 +47,13 @@ This config follows a few strict rules:
     <leader>xt   → :Test
     <leader>?    → Show leader mappings
 
+### Quickfix
+
+    ]q           → Next quickfix item
+    [q           → Previous quickfix item
+    <leader>co   → Open quickfix
+    <leader>cc   → Close quickfix
+
 ### Filetype-Local (Examples)
 
     ,b   → Build
@@ -85,8 +92,16 @@ Centralized logic supports:
 
 -   CMake projects → configure + build in `./build`\
 -   Makefile projects → `make`\
+-   justfile projects → `just build`, `just test`, `just clean` when recipes exist\
 -   Single file → compile to `file.out`\
 -   `:Test` → `ctest` or `make test`
+
+### Generic justfile Projects
+
+-   `:Build` → `just build` if a `build` recipe exists\
+-   `:Run` → `just run` if no filetype-specific runner exists\
+-   `:Test` → `just test` if a `test` recipe exists\
+-   `:Clean` → `just clean` if a `clean` recipe exists
 
 ### Rust
 
@@ -145,6 +160,12 @@ Toggles:
     <leader>tw   → Toggle wrap
     <leader>ts   → Toggle spell
     <leader>tn   → Toggle line numbers
+    <leader>tf   → Toggle format on save
+    <leader>th   → Toggle LSP inlay hints
+
+Scratch:
+
+    :Scratch     → Open a throwaway nofile buffer
 
 ------------------------------------------------------------------------
 
@@ -178,6 +199,7 @@ External tools (optional but recommended):
 -   `pytest`
 -   `cmake`
 -   `make`
+-   `just`
 -   `cargo`
 -   `go`
 -   `zathura` (or any PDF viewer)

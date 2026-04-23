@@ -10,6 +10,8 @@ M.ROOT_MARKERS = {
 	".git",
 	"Makefile",
 	"justfile",
+	"Justfile",
+	".justfile",
 	"CMakeLists.txt",
 	"compile_commands.json",
 	"pyproject.toml",
@@ -57,6 +59,40 @@ end
 
 local function is_make_project(root)
 	return is_file(root .. "/Makefile") or is_file(root .. "/makefile")
+end
+
+local function is_just_project(root)
+	return is_file(root .. "/justfile") or is_file(root .. "/Justfile") or is_file(root .. "/.justfile")
+end
+
+local function just_has_recipe(root, recipe)
+	if not (has("just") and is_just_project(root) and vim.system) then
+		return false
+	end
+
+	local ok, obj = pcall(vim.system, { "just", "--summary" }, { cwd = root, text = true })
+	if not (ok and obj) then
+		return false
+	end
+
+	local result = obj:wait()
+	if not result or result.code ~= 0 then
+		return false
+	end
+
+	for item in (result.stdout or ""):gmatch("%S+") do
+		if item == recipe then
+			return true
+		end
+	end
+	return false
+end
+
+local function just_spec(root, recipe)
+	if just_has_recipe(root, recipe) then
+		return { cmd = { "just", recipe }, cwd = root, artifact = nil, title = "just " .. recipe }
+	end
+	return nil
 end
 
 local function is_suckless_project(root)
@@ -165,6 +201,11 @@ function M.build_spec(opts)
 			return { cmd = { "make" }, cwd = root, artifact = nil, title = "make" }
 		end
 
+		local js = just_spec(root, "build")
+		if js then
+			return js
+		end
+
 		-- Single-file fallback
 		local out = vim.fn.expand("%:p:r") .. ".out"
 		if ft == "c" then
@@ -210,6 +251,11 @@ function M.build_spec(opts)
 		return { cmd = { "make" }, cwd = root, artifact = nil, title = "make" }
 	end
 
+	local js = just_spec(root, "build")
+	if js then
+		return js
+	end
+
 	return nil, "No :Build rule for filetype: " .. ft
 end
 
@@ -253,6 +299,10 @@ function M.clean_spec()
 		if is_make_project(root) then
 			return { cmd = { "make", "clean" }, cwd = root, title = "make clean" }
 		end
+		local js = just_spec(root, "clean")
+		if js then
+			return js
+		end
 		-- Single-file fallback: delete produced .out
 		local out = vim.fn.expand("%:p:r") .. ".out"
 		return { cmd = { "sh", "-lc", "rm -f " .. vim.fn.shellescape(out) }, cwd = dir, title = "rm .out" }
@@ -271,6 +321,10 @@ function M.clean_spec()
 	end
 	if is_make_project(root) then
 		return { cmd = { "make", "clean" }, cwd = root, title = "make clean" }
+	end
+	local js = just_spec(root, "clean")
+	if js then
+		return js
 	end
 	return nil, "No :Clean rule for filetype: " .. ft
 end
@@ -340,6 +394,10 @@ function M.test_spec(opts)
 		if is_make_project(root) then
 			return { cmd = { "make", "test" }, cwd = root, title = "make test" }
 		end
+		local js = just_spec(root, "test")
+		if js then
+			return js
+		end
 		return nil, "No project tests (C/C++ without Make/CMake)"
 	end
 
@@ -364,7 +422,17 @@ function M.test_spec(opts)
 		return { cmd = { "make", "test" }, cwd = root, title = "make test" }
 	end
 
+	local js = just_spec(root, "test")
+	if js then
+		return js
+	end
+
 	return nil, "No :Test rule for filetype: " .. ft
+end
+
+function M.just_spec(recipe)
+	local c = ctx()
+	return just_spec(c.root, recipe)
 end
 
 return M

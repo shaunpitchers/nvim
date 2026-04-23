@@ -66,6 +66,11 @@ vim.api.nvim_create_user_command("Run", function()
 
 	local cmd = cmd_by_ft[ft]
 	if not cmd then
+		local spec = B.just_spec("run")
+		if spec then
+			term("just run", spec.cwd)
+			return
+		end
 		vim.notify("No :Run command for filetype: " .. ft, vim.log.levels.WARN)
 		return
 	end
@@ -150,6 +155,36 @@ vim.api.nvim_create_user_command("Open", function(opts)
 	vim.notify("No opener found (install zathura or xdg-open)", vim.log.levels.WARN)
 end, { nargs = "?" })
 
+vim.api.nvim_create_user_command("Scratch", function()
+	vim.cmd("new")
+	vim.bo.buftype = "nofile"
+	vim.bo.bufhidden = "wipe"
+	vim.bo.swapfile = false
+	vim.api.nvim_buf_set_name(0, "Scratch")
+end, {})
+
+vim.api.nvim_create_user_command("ToggleFormatOnSave", function()
+	vim.b.format_on_save = not (vim.b.format_on_save ~= false)
+	vim.notify("Format on save: " .. (vim.b.format_on_save and "ON" or "OFF"), vim.log.levels.INFO)
+end, {})
+
+vim.api.nvim_create_user_command("ToggleInlayHints", function()
+	if not (vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable and vim.lsp.inlay_hint.is_enabled) then
+		vim.notify("Inlay hints are not supported by this Neovim", vim.log.levels.WARN)
+		return
+	end
+
+	local bufnr = vim.api.nvim_get_current_buf()
+	local ok, enabled = pcall(vim.lsp.inlay_hint.is_enabled, { bufnr = bufnr })
+	if not ok then
+		vim.notify("Could not read inlay hint state", vim.log.levels.WARN)
+		return
+	end
+
+	vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
+	vim.notify("Inlay hints: " .. (not enabled and "ON" or "OFF"), vim.log.levels.INFO)
+end, {})
+
 -- Mapping help (replacement for which-key): :Leader and :LocalLeader
 local function open_map_help(title, lines)
 	vim.cmd("new")
@@ -196,8 +231,3 @@ end, {})
 vim.api.nvim_create_user_command("OpenBackup", Backup.open_backup, {})
 vim.api.nvim_create_user_command("DiffBackup", Backup.diff_backup, {})
 vim.api.nvim_create_user_command("BackupPath", Backup.print_backup_path, {})
-
--- vim.keymap.set("n", "<leader>xr", "<cmd>Run<CR>", { desc = "Execute: run", nowait = true })
--- vim.keymap.set("n", "<leader>xb", "<cmd>Build<CR>", { desc = "Execute: build", nowait = true })
--- vim.keymap.set("n", "<leader>xo", "<cmd>Open<CR>", { desc = "Execute: open", nowait = true })
--- vim.keymap.set("n", "<leader>xt", "<cmd>Test<CR>", { desc = "Execute: test", nowait = true })
