@@ -11,7 +11,6 @@ vim.opt_local.colorcolumn = "89" -- optional; delete if you dislike
 -- Don't auto-wrap code while typing (manual gq is still available)
 vim.opt_local.formatoptions:remove({ "t", "c", "r", "o" })
 
-
 -- --------------
 -- Format on save
 -- --------------
