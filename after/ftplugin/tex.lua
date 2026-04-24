@@ -41,3 +41,12 @@ end
 map("<localleader>b", "<cmd>Build<cr>", "Build (LaTeX)")
 map("<localleader>o", "<cmd>Open<cr>", "Open PDF")
 map("<localleader>c", "<cmd>Clean<cr>", "Clean aux")
+map("<localleader>v", function()
+	vim.lsp.buf.execute_command({
+		command = "texlab.forwardSearch",
+		arguments = { {
+			uri = vim.uri_from_bufnr(0),
+			position = { line = vim.fn.line(".") - 1, character = 0 },
+		} },
+	})
+end, "Forward search (synctex → zathura)")

@@ -17,6 +17,9 @@ return {
 					"dockerfile",
 					"make",
 
+					"c",
+					"cpp",
+
 					"python",
 
 					"markdown",

@@ -3,7 +3,6 @@
 
 -- Basic
 vim.g.have_nerd_font = true
-vim.opt.encoding = "utf-8"
 
 -- Bracket matching (built-in)
 vim.opt.showmatch = true
@@ -35,10 +34,12 @@ vim.opt.shortmess:append("c") -- don't show completion messages
 vim.opt.backup = true
 vim.opt.writebackup = true
 vim.opt.backupdir = vim.fn.stdpath("state") .. "/backup//"
+vim.fn.mkdir(vim.fn.stdpath("state") .. "/backup", "p")
 
 -- undo
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.stdpath("state") .. "/undo//"
+vim.fn.mkdir(vim.fn.stdpath("state") .. "/undo", "p")
 
 -- swap
 vim.opt.swapfile = true

@@ -31,7 +31,7 @@ autocmd("BufWritePre", {
 
 -- Auto-reload files when changed externally
 augroup("auto_reload", { clear = true })
-autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+autocmd({ "FocusGained", "BufEnter" }, {
 	group = "auto_reload",
 	command = "checktime",
 })

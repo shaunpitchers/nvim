@@ -5,8 +5,9 @@ return {
 		event = "InsertEnter",
 		config = true,
 	},
-	{ "tpope/vim-surround" }, -- cs"'< etc.
-	{ "tpope/vim-commentary" }, -- gcc / gc{motion}
+
+	-- cs"' / ds" / ys{motion}" etc. (built-in gc covers commenting on 0.10+)
+	{ "tpope/vim-surround", event = "BufReadPost" },
 
 	-- auto-detect indent settings
 	{

@@ -2,13 +2,14 @@ return {
 	-- Completion core (always available)
 	{
 		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
+		event = { "InsertEnter", "CmdlineEnter" },
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-cmdline",
+			"saadparwaiz1/cmp_luasnip",
 			"onsails/lspkind.nvim",
-			-- snippet deps are intentionally NOT here anymore
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -31,7 +32,6 @@ return {
 					["<C-e>"] = cmp.mapping.abort(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
 
-					-- Keep Tab simple unless LuaSnip is loaded
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
@@ -55,7 +55,7 @@ return {
 
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
-					-- Snippet source only works when loaded (see below)
+					{ name = "luasnip" },
 					{ name = "buffer" },
 					{ name = "path" },
 				}),
@@ -74,18 +74,31 @@ return {
 					}),
 				},
 			})
+
+			-- Completion for / and ? (search)
+			cmp.setup.cmdline({ "/", "?" }, {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = { { name = "buffer" } },
+			})
+
+			-- Completion for : (command line)
+			cmp.setup.cmdline(":", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources(
+					{ { name = "path" } },
+					{ { name = "cmdline" } }
+				),
+				matching = { disallow_symbol_nonprefix_matching = false },
+			})
 		end,
 	},
 
-	-- Snippets only for writing filetypes
+	-- Snippets (ft-restricted: only loads for writing/code filetypes)
 	{
 		"L3MON4D3/LuaSnip",
 		ft = { "tex", "plaintex", "markdown", "html", "css", "python" },
 		build = "make install_jsregexp",
-		dependencies = {
-			"saadparwaiz1/cmp_luasnip",
-			"rafamadriz/friendly-snippets",
-		},
+		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
 			local luasnip = require("luasnip")
 			luasnip.config.set_config({
@@ -93,30 +106,14 @@ return {
 				updateevents = "TextChanged,TextChangedI",
 			})
 
-			-- load friendly-snippets lazily
 			require("luasnip.loaders.from_vscode").lazy_load()
 
-			-- load your personal Lua snippets (kept small + intentional)
 			require("luasnip.loaders.from_lua").lazy_load({
 				paths = { vim.fn.stdpath("config") .. "/snippets" },
 			})
 
-			-- Treat tex as latex for snippet purposes
 			luasnip.filetype_extend("tex", { "latex" })
 			luasnip.filetype_extend("plaintex", { "latex" })
-
-			-- When LuaSnip loads, also enable the cmp snippet source
-			local ok, cmp = pcall(require, "cmp")
-			if ok then
-				cmp.setup.buffer({
-					sources = cmp.config.sources({
-						{ name = "nvim_lsp" },
-						{ name = "luasnip" },
-						{ name = "buffer" },
-						{ name = "path" },
-					}),
-				})
-			end
 		end,
 	},
 }

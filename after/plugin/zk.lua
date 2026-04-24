@@ -221,9 +221,9 @@ vim.api.nvim_create_autocmd("FileType", {
 				return
 			end
 
-			-- ID link: [[YYYYMMDDHHMMSS]]
+			-- ID link: [[YYYYMMDDHHMMSS]] — search all subdirs
 			if target:match("^%d%d%d%d%d%d%d%d%d%d%d%d%d%d$") then
-				local res = vim.fn.globpath(p.notes, target .. "-*.md", false, true)
+				local res = vim.fn.glob(p.root .. "/**/" .. target .. "-*.md", false, true)
 				local hit = (type(res) == "table" and res[1]) or nil
 				if hit and hit ~= "" then
 					vim.cmd("edit " .. vim.fn.fnameescape(hit))

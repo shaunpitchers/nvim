@@ -124,6 +124,21 @@ return {
 					yamlls = function()
 						lspconfig.yamlls.setup({ capabilities = capabilities })
 					end,
+
+					texlab = function()
+						lspconfig.texlab.setup({
+							capabilities = capabilities,
+							settings = {
+								texlab = {
+									forwardSearch = {
+										executable = "zathura",
+										args = { "--synctex-forward", "%l:1:%f", "%p" },
+									},
+									chktex = { onOpenAndSave = true },
+								},
+							},
+						})
+					end,
 				},
 			}
 		end,
@@ -142,6 +157,8 @@ return {
 					end
 
 					map("n", "gd", vim.lsp.buf.definition, "Goto definition")
+					map("n", "gI", vim.lsp.buf.implementation, "Goto implementation")
+					map("n", "gD", vim.lsp.buf.type_definition, "Goto type definition")
 					map("n", "gr", vim.lsp.buf.references, "Goto references")
 					map("n", "K", vim.lsp.buf.hover, "Hover docs")
 					map("n", "<leader>r", vim.lsp.buf.rename, "Rename all in buffer")
