@@ -41,9 +41,10 @@ require("lazy").setup({
 	-- Core functionality
 	{ import = "plugins.lsp" },
 	{ import = "plugins.cmp" },
-	-- IDE enhancements
+
+	-- Search/navigation
 	{ import = "plugins.treesitter" },
-	{ import = "plugins.ide" },
+	{ import = "plugins.search" },
 
 	-- Editor enhancements
 	{ import = "plugins.editor" },

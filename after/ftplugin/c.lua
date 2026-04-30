@@ -2,16 +2,12 @@
 
 local U = require("core.utils")
 
-local map = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
-end
-
 -- localleader execution mappings
-map("<localleader>b", "<cmd>Build<cr>", "Build")
-map("<localleader>r", "<cmd>Run<cr>", "Run")
-map("<localleader>o", "<cmd>Open<cr>", "Open")
-map("<localleader>t", "<cmd>Test<cr>", "Test")
-map("<localleader>c", "<cmd>Clean<cr>", "Clean")
+U.bufmap("<localleader>b", "<cmd>Build<cr>", "Build")
+U.bufmap("<localleader>r", "<cmd>Run<cr>", "Run")
+U.bufmap("<localleader>o", "<cmd>Open<cr>", "Open")
+U.bufmap("<localleader>t", "<cmd>Test<cr>", "Test")
+U.bufmap("<localleader>c", "<cmd>Clean<cr>", "Clean")
 
 ------------------------------------------------------------------
 -- Auto rebuild suckless projects when editing config.h

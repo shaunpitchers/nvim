@@ -1,9 +1,26 @@
 -- ~/.config/nvim/after/ftplugin/markdown.lua
 -- Markdown: build on save + localleader build/run/open/clean.
--- Build/Clean/Open are centralized in lua/core/build.lua and lua/core/commands.lua.
+-- Build/Clean/Open are centralized in lua/core/tasks/ and lua/core/commands/.
 
 local U = require("core.utils")
 local B = require("core.build")
+
+-- Lazy-loaded Markdown plugins can cause the ftplugin to be re-applied.
+-- Neovim's bundled markdown.lua may emit E31 while undoing Treesitter maps.
+if vim.b.undo_ftplugin then
+	local undo = vim.b.undo_ftplugin
+	undo = undo:gsub("call v:lua%.vim%.treesitter%.stop%(%)", "silent! call v:lua.vim.treesitter.stop()")
+	undo = undo:gsub("|sil! nunmap <buffer> %[%[", "")
+	undo = undo:gsub("|sil! nunmap <buffer> %]%]", "")
+	undo = undo:gsub("|sil! xunmap <buffer> %[%[", "")
+	undo = undo:gsub("|sil! xunmap <buffer> %]%]", "")
+	undo = undo:gsub('\n sil! exe "nunmap <buffer> gO"', "")
+	undo = undo:gsub('\n sil! exe "nunmap <buffer> %]%]" | sil! exe "nunmap <buffer> %[%["', "")
+	vim.b.undo_ftplugin = undo
+		.. "\n call v:lua.require('core.utils').bufunmap(['n', 'x'], '[[')"
+		.. "\n call v:lua.require('core.utils').bufunmap(['n', 'x'], ']]')"
+		.. "\n call v:lua.require('core.utils').bufunmap('n', 'gO')"
+end
 
 -- Build lock (buffer-local) to avoid overlaps.
 if vim.b.build_running == nil then
@@ -38,10 +55,6 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 	callback = build_on_save,
 })
 
-local map = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
-end
-
-map("<localleader>b", "<cmd>Build<cr>", "Build (Markdown)")
-map("<localleader>o", "<cmd>Open<cr>", "Open output (PDF by default)")
-map("<localleader>c", "<cmd>Clean<cr>", "Clean outputs")
+U.bufmap("<localleader>b", "<cmd>Build<cr>", "Build (Markdown)")
+U.bufmap("<localleader>o", "<cmd>Open<cr>", "Open output (PDF by default)")
+U.bufmap("<localleader>c", "<cmd>Clean<cr>", "Clean outputs")

@@ -1,5 +1,7 @@
 -- ~/.config/nvim/after/ftplugin/python.lua
 
+local U = require("core.utils")
+
 -- Buffer-local options
 vim.opt_local.expandtab = true
 vim.opt_local.shiftwidth = 4
@@ -36,13 +38,8 @@ vim.b.match_words = table.concat({
 	"class",
 }, ",")
 
--- in after/ftplugin/<ft>.lua
-local map = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
-end
-
-map("<localleader>b", "<cmd>Build<cr>", "Build")
-map("<localleader>r", "<cmd>Run<cr>", "Run")
-map("<localleader>o", "<cmd>Open<cr>", "Open")
-map("<localleader>t", "<cmd>Test<cr>", "Test")
--- map("<localleader>c", "<cmd>Clean<cr>", "Clean") -- optional
+U.bufmap("<localleader>b", "<cmd>Build<cr>", "Build")
+U.bufmap("<localleader>r", "<cmd>Run<cr>", "Run")
+U.bufmap("<localleader>o", "<cmd>Open<cr>", "Open")
+U.bufmap("<localleader>t", "<cmd>Test<cr>", "Test")
+U.bufmap("<localleader>c", "<cmd>Clean<cr>", "Clean")

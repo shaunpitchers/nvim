@@ -1,6 +1,6 @@
 -- ~/.config/nvim/after/ftplugin/tex.lua
 -- LaTeX: build on save + localleader build/run/open/clean.
--- Build/Clean/Open are centralized in lua/core/build.lua and lua/core/commands.lua.
+-- Build/Clean/Open are centralized in lua/core/tasks/ and lua/core/commands/.
 
 local U = require("core.utils")
 local B = require("core.build")
@@ -33,20 +33,18 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 	callback = build_on_save,
 })
 
-local map = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { buffer = true, silent = true, desc = desc })
-end
-
 -- Filetype-local execution keys
-map("<localleader>b", "<cmd>Build<cr>", "Build (LaTeX)")
-map("<localleader>o", "<cmd>Open<cr>", "Open PDF")
-map("<localleader>c", "<cmd>Clean<cr>", "Clean aux")
-map("<localleader>v", function()
+U.bufmap("<localleader>b", "<cmd>Build<cr>", "Build (LaTeX)")
+U.bufmap("<localleader>o", "<cmd>Open<cr>", "Open PDF")
+U.bufmap("<localleader>c", "<cmd>Clean<cr>", "Clean aux")
+U.bufmap("<localleader>v", function()
 	vim.lsp.buf.execute_command({
 		command = "texlab.forwardSearch",
-		arguments = { {
-			uri = vim.uri_from_bufnr(0),
-			position = { line = vim.fn.line(".") - 1, character = 0 },
-		} },
+		arguments = {
+			{
+				uri = vim.uri_from_bufnr(0),
+				position = { line = vim.fn.line(".") - 1, character = 0 },
+			},
+		},
 	})
 end, "Forward search (synctex → zathura)")

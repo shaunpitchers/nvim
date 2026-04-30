@@ -34,6 +34,19 @@ This config follows a few strict rules:
 
 ------------------------------------------------------------------------
 
+## Layout
+
+-   `init.lua` bootstraps core config and lazy.nvim.
+-   `lua/core/` keeps stable core entry points.
+-   `lua/core/tasks/` chooses build, clean, and test commands.
+-   `lua/core/commands/` registers user commands.
+-   `lua/plugins/` contains lazy.nvim plugin specs.
+-   `after/ftplugin/` contains filetype-local options and mappings.
+-   `snippets/` contains local LuaSnip snippets.
+-   `docs/` contains reference notes and cheatsheets.
+
+------------------------------------------------------------------------
+
 ## Leader Keys
 
     Leader        = <Space>
@@ -141,7 +154,7 @@ Supported filetypes:
 
 Snippets are stored in:
 
-    lua/snippets/
+    snippets/
 
 ------------------------------------------------------------------------
 

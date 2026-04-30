@@ -1,4 +1,4 @@
--- lua/config/backup.lua
+-- ~/.config/nvim/lua/core/backup.lua
 local M = {}
 
 local function backup_dir()

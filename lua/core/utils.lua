@@ -1,4 +1,4 @@
--- ~/.config/nvim/lua/utils.lua
+-- ~/.config/nvim/lua/core/utils.lua
 -- Small helper functions to keep the rest of the config simple.
 -- Everything here is plugin-free on purpose.
 
@@ -35,6 +35,28 @@ function M.root(markers, startpath)
 		return vim.fs.dirname(found)
 	end
 	return start
+end
+
+---Create a normal-mode buffer-local keymap.
+---@param lhs string
+---@param rhs string|function
+---@param desc string
+---@param mode string|string[]?
+function M.bufmap(lhs, rhs, desc, mode)
+	vim.keymap.set(mode or "n", lhs, rhs, { buffer = true, silent = true, desc = desc })
+end
+
+---Delete a buffer-local keymap only if it exists.
+---@param mode string|string[]
+---@param lhs string
+function M.bufunmap(mode, lhs)
+	local modes = type(mode) == "table" and mode or { mode }
+	for _, m in ipairs(modes) do
+		local ok, info = pcall(vim.fn.maparg, lhs, m, false, true)
+		if ok and type(info) == "table" and info.buffer == 1 then
+			pcall(vim.keymap.del, m, lhs, { buffer = true })
+		end
+	end
 end
 
 ---Start an async job with buffered stdout/stderr and a simple notification.
