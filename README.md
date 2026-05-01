@@ -1,258 +1,307 @@
 # Neovim Configuration
 
-Minimal, automation-first Neovim setup.
+Minimal, automation-first Neovim setup for writing, scripting, and small project work.
 
-This configuration avoids heavy plugin stacks and focuses on:
+The config keeps the editor close to native Vim/Neovim behaviour while adding a small set of high-value workflows:
 
--   Native Vim fluency\
--   Filetype-aware automation\
--   Minimal plugins with high ROI\
--   Project-aware build/test workflows\
--   Clean, predictable behavior
-
-------------------------------------------------------------------------
-
-## Philosophy
-
-This config follows a few strict rules:
-
-1.  **Minimal plugins**
-    -   Every plugin must add real functionality.
-    -   No cosmetic bloat.
-    -   No "convenience" plugins unless they remove meaningful friction.
-2.  **Prefer built-in functionality**
-    -   Use native Vim motions.
-    -   Use `:grep`, quickfix, and built-ins where possible.
-    -   Learn defaults instead of remapping them away.
-3.  **Filetype-local actions**
-    -   `<leader>` → global/editor actions.
-    -   `<localleader>` → filetype/project-specific actions.
-4.  **Automation without magic**
-    -   Build, run, test, and clean commands are predictable.
-    -   No hidden behavior.
-    -   No guessing unless it's clearly safe.
-
-------------------------------------------------------------------------
+- project-aware build, run, test, and clean commands
+- writing ergonomics for Markdown, LaTeX, mail, and prose
+- lightweight LSP, completion, snippets, and Treesitter
+- plugin-free defaults where built-ins are good enough
+- filetype-local actions through `<localleader>`
 
 ## Layout
 
--   `init.lua` bootstraps core config and lazy.nvim.
--   `lua/core/` keeps stable core entry points.
--   `lua/core/tasks/` chooses build, clean, and test commands.
--   `lua/core/commands/` registers user commands.
--   `lua/plugins/` contains lazy.nvim plugin specs.
--   `after/ftplugin/` contains filetype-local options and mappings.
--   `snippets/` contains local LuaSnip snippets.
--   `docs/` contains reference notes and cheatsheets.
+| Path | Purpose |
+| --- | --- |
+| `init.lua` | Bootstraps core config and lazy.nvim. |
+| `lua/core/options.lua` | Global editor options. |
+| `lua/core/autocmds.lua` | General autocmds for editing, writing, formatting, and LSP behaviour. |
+| `lua/core/mappings.lua` | Global keymaps. |
+| `lua/core/commands.lua` | User-command registry. |
+| `lua/core/commands/` | Focused command modules. |
+| `lua/core/tasks/` | Build, clean, test, and project-detection logic. |
+| `lua/core/zk.lua` | Zettelkasten Markdown helpers. |
+| `lua/plugins/` | lazy.nvim plugin specs. |
+| `after/ftplugin/` | Filetype-local options, mappings, and automation. |
+| `after/plugin/zk.lua` | Tiny Zettelkasten loader. |
+| `snippets/` | Local LuaSnip snippets. |
+| `docs/` | Reference notes and cheatsheets. |
+| `thesaurus/` | Local thesaurus data used for writing completion. |
 
-------------------------------------------------------------------------
+## Core Principles
+
+1. Keep plugins minimal and purposeful.
+2. Prefer native quickfix, location lists, netrw, grep, and Vim motions.
+3. Use `<leader>` for global/editor commands.
+4. Use `<localleader>` for filetype or project-specific actions.
+5. Prefer explicit commands over hidden automation.
+6. Make automation easy to disable when it gets in the way.
 
 ## Leader Keys
 
-    Leader        = <Space>
-    LocalLeader   = ,
+```text
+Leader       <Space>
+LocalLeader  ,
+```
 
-### Execution (Global)
+## Global Mappings
 
-    <leader>xb   → :Build
-    <leader>xr   → :Run
-    <leader>xo   → :Open
-    <leader>xt   → :Test
-    <leader>?    → Show leader mappings
+| Mapping | Action |
+| --- | --- |
+| `<C-h/j/k/l>` | Move between windows. |
+| `]d` / `[d` | Next / previous diagnostic. |
+| `gl` | Show diagnostics for current line. |
+| `]q` / `[q` | Next / previous quickfix item. |
+| `<leader>co` | Open quickfix. |
+| `<leader>cc` | Close quickfix. |
+| `<leader>cl` | Send current diagnostics to the location list. |
+| `<leader>cq` | Send workspace diagnostics to quickfix. |
+| `<leader>sf` | Fuzzy-find files with fzf. |
+| `<leader>sg` | Live grep with ripgrep/fzf. |
+| `<leader>e` | Open netrw file explorer. |
+| `<leader>cd` | Set local working directory to the current file directory. |
+| `<leader>?` | Show leader mappings. |
 
-### Quickfix
+## Git Mappings
 
-    ]q           → Next quickfix item
-    [q           → Previous quickfix item
-    <leader>co   → Open quickfix
-    <leader>cc   → Close quickfix
-    <leader>cl   → Current diagnostics to location list
-    <leader>cq   → Workspace diagnostics to quickfix
+| Mapping | Action |
+| --- | --- |
+| `<leader>gs` | Fugitive status. |
+| `<leader>gd` | Fugitive diff split. |
+| `<leader>gc` | Commit. |
+| `<leader>gp` | Push. |
+| `<leader>gP` | Pull. |
+| `<leader>gb` | Blame. |
+| `<leader>gw` | Stage current file. |
+| `<leader>gr` | Read file from Git index/HEAD through Fugitive. |
 
-### Filetype-Local (Examples)
+## Build, Run, Test, Clean
 
-    ,b   → Build
-    ,r   → Run
-    ,o   → Open artifact
-    ,c   → Clean
-    ,t   → Test
-    ,i   → Install suckless project when editing config.h
+Global execution mappings:
 
-These are buffer-local and depend on filetype.
+| Mapping | Command |
+| --- | --- |
+| `<leader>xb` | `:Build` |
+| `<leader>xr` | `:Run` |
+| `<leader>xo` | `:Open` |
+| `<leader>xt` | `:Test` |
 
-------------------------------------------------------------------------
+Filetype-local mappings generally use:
 
-## Build / Run / Test / Clean
+| Mapping | Action |
+| --- | --- |
+| `,b` | Build. |
+| `,r` | Run. |
+| `,o` | Open generated artifact or current file. |
+| `,c` | Clean generated files. |
+| `,t` | Test. |
 
-Centralized logic supports:
+### Supported Workflows
 
-### Python
+| Filetype / project | Behaviour |
+| --- | --- |
+| Python | `:Run` runs the current file, `:Test` uses pytest or unittest, `:Clean` removes `__pycache__`. |
+| Markdown | `:Build` uses pandoc, `:Open` opens the output, `:Clean` removes generated PDF/HTML. |
+| LaTeX | `:Build` uses latexmk, `:Open` opens the PDF, `:Clean` runs `latexmk -c`. |
+| C / C++ | CMake, Makefile, justfile, or single-file compile-to-`.out` workflow. |
+| Rust | `cargo build`, `cargo run`, `cargo test`, `cargo clean`. |
+| Go | `go build`, `go run`, `go test`, `go clean`. |
+| Shell | `:Build` uses shellcheck if available, `:Test` uses bats if available. |
+| justfile projects | `just build`, `just run`, `just test`, `just clean` when recipes exist. |
 
--   `:Run` → run current file\
--   `:Test` → pytest (or unittest fallback)\
--   `:Clean` → remove `__pycache__`
+### Build On Save
 
-### LaTeX
+Markdown and LaTeX build on save by default.
 
--   `:Build` → `latexmk`\
--   `:Open` → open PDF\
--   `:Clean` → `latexmk -c`
+```vim
+:ToggleBuildOnSave
+```
 
-### Markdown
+For Markdown, the default build target is PDF. Toggle HTML output per buffer:
 
--   `:Build` → pandoc (PDF or HTML)\
--   `:Open` → open output file\
--   `:Clean` → remove generated output\
--   `:ToggleMarkdownTarget` → switch build-on-save between PDF and HTML
+```vim
+:ToggleMarkdownTarget
+```
 
-### C / C++
+## Writing Workflow
 
--   CMake projects → configure + build in `./build`\
--   Makefile projects → `make`\
--   justfile projects → `just build`, `just test`, `just clean` when recipes exist\
--   Single file → compile to `file.out`\
--   `:Test` → `ctest` or `make test`\
--   `:SucklessInstall` → install a suckless project from `config.h`
+Writing filetypes get spell checking, wrapping, `breakindent`, `textwidth`, and thesaurus completion.
 
-### Generic justfile Projects
+Writing filetypes include:
 
--   `:Build` → `just build` if a `build` recipe exists\
--   `:Run` → `just run` if no filetype-specific runner exists\
--   `:Test` → `just test` if a `test` recipe exists\
--   `:Clean` → `just clean` if a `clean` recipe exists
+- Markdown
+- LaTeX / plaintex
+- text
+- mail
+- gitcommit
+- rst
+- asciidoc
+- org
 
-### Rust
+Useful writing commands:
 
--   `cargo build`\
--   `cargo run`\
--   `cargo test`
+| Mapping / command | Action |
+| --- | --- |
+| `<C-d>` in insert mode | Dictionary completion. |
+| `<leader>ww` / `:WordCount` | Show word and character count. |
+| `<leader>wp` / `:ReadingPosition` | Show current line and percentage through file. |
+| `<leader>wm` / `:ToggleMarkdownTarget` | Toggle Markdown PDF/HTML target. |
+| `<leader>zz` / `:ToggleDistractionFree` | Toggle distraction-free writing view. |
 
-### Go
+## Coding Workflow
 
--   `go build`\
--   `go run`\
--   `go test`
+Code and config buffers get:
 
-------------------------------------------------------------------------
+- LSP diagnostics without inline virtual text
+- document highlights on cursor hold when supported by the server
+- LSP format-on-save where supported, excluding Markdown and TeX
+- trailing whitespace trimming on save
+- cursor position restore when reopening files
+- automatic parent-directory creation before saving new files
+- automatic file reload checks on focus/buffer enter
+
+Useful commands:
+
+| Command | Action |
+| --- | --- |
+| `:Diagnostics` | Open current diagnostics in the location list. |
+| `:Diagnostics!` | Open diagnostics in quickfix. |
+| `:ToggleFormatOnSave` | Toggle LSP format-on-save for the current buffer. |
+| `:ToggleInlayHints` | Toggle LSP inlay hints for the current buffer. |
+| `:Scratch` | Open a throwaway nofile buffer. |
+
+## LSP Mappings
+
+| Mapping | Action |
+| --- | --- |
+| `gd` | Go to definition. |
+| `gI` | Go to implementation. |
+| `gD` | Go to type definition. |
+| `gr` | References. |
+| `K` | Hover docs. |
+| `<leader>r` | Rename. |
+| `<leader>ca` | Code action. |
+| `<leader>cf` | Format. |
+| `<leader>ci` | LSP info. |
+
+## Suckless Projects
+
+When editing a suckless-style `config.h`, the C ftplugin detects `config.mk` and adds:
+
+```vim
+:SucklessInstall
+```
+
+and:
+
+```text
+,i
+```
+
+Auto-install on save is intentionally opt-in. Enable it per buffer:
+
+```vim
+:let b:suckless_auto_install = v:true
+```
+
+or globally:
+
+```vim
+:let g:suckless_auto_install = v:true
+```
+
+## Zettelkasten Helpers
+
+Markdown files inside a `zettelkasten` tree get small helpers from `core.zk`:
+
+- insert templates for new notes, inbox items, sources, MOCs, and projects
+- fill empty `id:` and `created:` frontmatter fields for new note/inbox files
+- resolve `[[YYYYMMDDHHMMSS]]` links with `gf`
 
 ## Snippets
 
-Using:
+Completion uses `nvim-cmp` and `LuaSnip`.
 
--   `nvim-cmp`
--   `LuaSnip`
+Local snippets live in:
 
-Snippets are:
+```text
+snippets/
+```
 
--   Minimal\
--   Filetype-specific\
--   Personally curated\
--   No massive snippet collections
+Supported local snippet filetypes:
 
-Supported filetypes:
+- `tex`
+- `markdown`
+- `html`
+- `css`
+- `python`
 
--   `tex`
--   `markdown`
--   `html`
--   `css`
--   `python`
+## Search And Navigation
 
-Snippets are stored in:
+- fzf.vim provides `:Files`, `:Rg`, `:Buffers`, `:Lines`, `:BLines`, `:Commits`, `:History`, and `:Maps`.
+- `ripgrep` powers `:grep` through `grepprg`.
+- netrw remains the file explorer.
+- `:Leader` and `:LocalLeader` provide lightweight mapping help without which-key.
 
-    snippets/
+## Backups And Undo
 
-------------------------------------------------------------------------
+The config enables:
 
-## Writing Ergonomics
+- persistent undo in Neovim state
+- central backup files in Neovim state
+- helper commands for current-file backups
 
-For writing filetypes (LaTeX, Markdown):
+Backup commands:
 
--   Spell enabled\
--   Line wrapping enabled\
--   `breakindent` enabled\
--   Custom `showbreak`\
--   `textwidth` configured
-
-Toggles:
-
-    <leader>tw   → Toggle wrap
-    <leader>ts   → Toggle spell
-    <leader>tn   → Toggle line numbers
-    <leader>tf   → Toggle format on save
-    <leader>tb   → Toggle build on save
-    <leader>th   → Toggle LSP inlay hints
-    <leader>zz   → Toggle distraction-free writing
-
-Writing commands:
-
-    <leader>ww   → Word count
-    <leader>wp   → Reading position
-    <leader>wm   → Toggle Markdown build target
-
-Scratch:
-
-    :Scratch     → Open a throwaway nofile buffer
-
-------------------------------------------------------------------------
-
-## Performance
-
--   Lazy-loaded plugins\
--   Minimal runtime plugins\
--   `vim.loader.enable()` (if supported)\
--   No which-key\
--   No UI-heavy helpers\
--   Treesitter used intentionally
-
-------------------------------------------------------------------------
-
-## Mapping Help (which-key alternative)
-
-    :Leader        → Show leader mappings
-    :LocalLeader   → Show buffer-local mappings
-
-No popup delay. Just clarity when needed.
-
-------------------------------------------------------------------------
+| Command | Action |
+| --- | --- |
+| `:OpenBackup` | Open the current file's backup. |
+| `:DiffBackup` | Diff the current file against its backup. |
+| `:BackupPath` | Print the detected backup path. |
 
 ## Requirements
 
-External tools (optional but recommended):
+Core tools:
 
--   `ripgrep`
--   `latexmk`
--   `pandoc`
--   `pytest`
--   `cmake`
--   `make`
--   `just`
--   `cargo`
--   `go`
--   `zathura` (or any PDF viewer)
--   `shellcheck`
+- `git`
+- `ripgrep`
+- `fzf`
 
-------------------------------------------------------------------------
+Recommended by workflow:
 
-## Design Goals
+- `python3`
+- `pytest`
+- `shellcheck`
+- `bats`
+- `pandoc`
+- `latexmk`
+- `zathura`
+- `cmake`
+- `make`
+- `just`
+- `cargo`
+- `go`
 
-This setup is designed for:
+Neovim health checks are handled by the normal:
 
--   Writing documents (LaTeX/Markdown)\
--   Editing scripts\
--   Python development\
--   Small to medium C/C++ projects\
--   Lightweight project workflows
+```vim
+:checkhealth
+```
 
-It intentionally avoids:
+## Plugin Policy
 
--   Large IDE-like abstraction layers\
--   Over-automation\
--   Hidden behavior
+Plugins are kept small and purposeful:
 
-------------------------------------------------------------------------
+- LSP: `mason.nvim`, `mason-lspconfig.nvim`, `nvim-lspconfig`
+- Completion: `nvim-cmp`, LuaSnip, cmp sources
+- Syntax: `nvim-treesitter`, `rainbow-delimiters.nvim`
+- Search: fzf/fzf.vim
+- Git: vim-fugitive
+- Editing: vim-surround, vim-sleuth, nvim-autopairs
 
-## Future Improvements
+`lazy-lock.json` is tracked so plugin versions are reproducible.
 
-Improvements are added only when real bottlenecks appear.
+## Design Goal
 
-Until then: stability \> features.
+This setup is intended to stay fast, boring, and predictable while still covering daily writing and coding work. New features should remove real friction rather than turn the config into a large framework.
