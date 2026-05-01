@@ -10,7 +10,7 @@ U.bufmap("<localleader>t", "<cmd>Test<cr>", "Test")
 U.bufmap("<localleader>c", "<cmd>Clean<cr>", "Clean")
 
 ------------------------------------------------------------------
--- Auto rebuild suckless projects when editing config.h
+-- Suckless project install helper for config.h
 ------------------------------------------------------------------
 
 -- Only trigger for config.h
@@ -29,12 +29,22 @@ if vim.fn.filereadable(root .. "/config.mk") == 0 then
 	return
 end
 
--- Create autocmd for this buffer only
+local function install_suckless()
+	local cmd = string.format("cd %q && sudo make clean && make && sudo make install", root)
+	U.job(cmd, { title = "Suckless Install" })
+end
+
+vim.api.nvim_buf_create_user_command(0, "SucklessInstall", install_suckless, {})
+U.bufmap("<localleader>i", "<cmd>SucklessInstall<cr>", "Install suckless project")
+
+local group = U.augroup("SucklessAutoInstall", false)
+vim.api.nvim_clear_autocmds({ group = group, buffer = 0 })
 vim.api.nvim_create_autocmd("BufWritePost", {
+	group = group,
 	buffer = 0,
 	callback = function()
-		local cmd = string.format("cd %q && sudo make clean && make && sudo make install", root)
-
-		U.job(cmd, { title = "Suckless Rebuild" })
+		if vim.b.suckless_auto_install or vim.g.suckless_auto_install then
+			install_suckless()
+		end
 	end,
 })

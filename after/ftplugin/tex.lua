@@ -13,6 +13,10 @@ end
 local group = U.augroup("TexBuildOnSave", false)
 
 local function build_on_save()
+	if vim.b.build_on_save == false then
+		return
+	end
+
 	if vim.b.build_running then
 		return
 	end

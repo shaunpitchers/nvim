@@ -66,6 +66,8 @@ This config follows a few strict rules:
     [q           → Previous quickfix item
     <leader>co   → Open quickfix
     <leader>cc   → Close quickfix
+    <leader>cl   → Current diagnostics to location list
+    <leader>cq   → Workspace diagnostics to quickfix
 
 ### Filetype-Local (Examples)
 
@@ -74,6 +76,7 @@ This config follows a few strict rules:
     ,o   → Open artifact
     ,c   → Clean
     ,t   → Test
+    ,i   → Install suckless project when editing config.h
 
 These are buffer-local and depend on filetype.
 
@@ -99,7 +102,8 @@ Centralized logic supports:
 
 -   `:Build` → pandoc (PDF or HTML)\
 -   `:Open` → open output file\
--   `:Clean` → remove generated output
+-   `:Clean` → remove generated output\
+-   `:ToggleMarkdownTarget` → switch build-on-save between PDF and HTML
 
 ### C / C++
 
@@ -107,7 +111,8 @@ Centralized logic supports:
 -   Makefile projects → `make`\
 -   justfile projects → `just build`, `just test`, `just clean` when recipes exist\
 -   Single file → compile to `file.out`\
--   `:Test` → `ctest` or `make test`
+-   `:Test` → `ctest` or `make test`\
+-   `:SucklessInstall` → install a suckless project from `config.h`
 
 ### Generic justfile Projects
 
@@ -174,7 +179,15 @@ Toggles:
     <leader>ts   → Toggle spell
     <leader>tn   → Toggle line numbers
     <leader>tf   → Toggle format on save
+    <leader>tb   → Toggle build on save
     <leader>th   → Toggle LSP inlay hints
+    <leader>zz   → Toggle distraction-free writing
+
+Writing commands:
+
+    <leader>ww   → Word count
+    <leader>wp   → Reading position
+    <leader>wm   → Toggle Markdown build target
 
 Scratch:
 

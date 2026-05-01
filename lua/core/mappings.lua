@@ -34,6 +34,8 @@ map("n", "[q", function()
 end, { desc = "Prev quickfix" })
 map("n", "<leader>co", "<cmd>copen<CR>", { desc = "Open quickfix" })
 map("n", "<leader>cc", "<cmd>cclose<CR>", { desc = "Close quickfix" })
+map("n", "<leader>cl", "<cmd>Diagnostics<CR>", { desc = "Diagnostics to loclist" })
+map("n", "<leader>cq", "<cmd>Diagnostics!<CR>", { desc = "Diagnostics to quickfix" })
 
 --------------
 -- Git
@@ -90,6 +92,9 @@ map("n", "<leader>xt", "<cmd>Test<CR>", { desc = "Execute: test" })
 ---Writing
 ------------
 vim.keymap.set("i", "<C-d>", "<C-x><C-k>", { desc = "Dictionary completion" })
+map("n", "<leader>ww", "<cmd>WordCount<CR>", { desc = "Word count" })
+map("n", "<leader>wp", "<cmd>ReadingPosition<CR>", { desc = "Reading position" })
+map("n", "<leader>wm", "<cmd>ToggleMarkdownTarget<CR>", { desc = "Toggle Markdown target" })
 
 --------------
 -- Toggles
@@ -121,5 +126,7 @@ map("n", "<leader>tw", toggle_wrap, { desc = "Toggle wrap" })
 map("n", "<leader>ts", toggle_spell, { desc = "Toggle spell" })
 map("n", "<leader>tn", toggle_numbers, { desc = "Toggle line numbers" })
 map("n", "<leader>tf", "<cmd>ToggleFormatOnSave<CR>", { desc = "Toggle format on save" })
+map("n", "<leader>tb", "<cmd>ToggleBuildOnSave<CR>", { desc = "Toggle build on save" })
 map("n", "<leader>th", "<cmd>ToggleInlayHints<CR>", { desc = "Toggle inlay hints" })
+map("n", "<leader>zz", "<cmd>ToggleDistractionFree<CR>", { desc = "Toggle distraction-free" })
 map("n", "<leader>?", "<cmd>Leader<cr>", { desc = "Show <leader> mappings" })

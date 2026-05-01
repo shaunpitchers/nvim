@@ -32,6 +32,10 @@ local group = U.augroup("MarkdownBuildOnSave", false)
 -- Default: build PDF on save. If you prefer HTML for a buffer:
 --   :let b:md_build_target = "html"
 local function build_on_save()
+	if vim.b.build_on_save == false then
+		return
+	end
+
 	if vim.b.build_running then
 		return
 	end

@@ -36,6 +36,49 @@ autocmd({ "FocusGained", "BufEnter" }, {
 	command = "checktime",
 })
 
+-- Restore the last cursor position when reopening files
+augroup("restore_cursor", { clear = true })
+autocmd("BufReadPost", {
+	group = "restore_cursor",
+	callback = function(args)
+		local mark = vim.api.nvim_buf_get_mark(args.buf, '"')
+		local line_count = vim.api.nvim_buf_line_count(args.buf)
+		if mark[1] > 0 and mark[1] <= line_count then
+			pcall(vim.api.nvim_win_set_cursor, 0, mark)
+		end
+	end,
+})
+
+-- Trim trailing whitespace for code/config buffers, but leave prose alone.
+local trim_skip_ft = {
+	markdown = true,
+	tex = true,
+	plaintex = true,
+	text = true,
+	mail = true,
+	gitcommit = true,
+	rst = true,
+	asciidoc = true,
+	org = true,
+}
+
+augroup("trim_code_whitespace", { clear = true })
+autocmd("BufWritePre", {
+	group = "trim_code_whitespace",
+	callback = function(args)
+		local bo = vim.bo[args.buf]
+		if bo.buftype ~= "" or not bo.modifiable or bo.readonly or trim_skip_ft[bo.filetype] then
+			return
+		end
+
+		local view = vim.fn.winsaveview()
+		vim.api.nvim_buf_call(args.buf, function()
+			vim.cmd([[%s/\s\+$//e]])
+		end)
+		pcall(vim.fn.winrestview, view)
+	end,
+})
+
 -- Spell settings: enable for writing buffers, disable for code buffers
 
 local aug = vim.api.nvim_create_augroup("SpellControl", { clear = true })
@@ -200,38 +243,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		})
 	end,
 })
-
--- Minimal distraction-free writing toggle (no ZenMode plugin)
-local function toggle_distraction_free()
-	local b = vim.b
-
-	if not b._df then
-		b._df = {
-			number = vim.wo.number,
-			relativenumber = vim.wo.relativenumber,
-			signcolumn = vim.wo.signcolumn,
-			showmode = vim.o.showmode,
-			laststatus = vim.o.laststatus,
-			cmdheight = vim.o.cmdheight,
-		}
-
-		vim.wo.number = false
-		vim.wo.relativenumber = false
-		vim.wo.signcolumn = "no"
-		vim.o.showmode = false
-		vim.o.laststatus = 0
-		vim.o.cmdheight = 0
-		vim.cmd("setlocal scrolloff=999")
-	else
-		vim.wo.number = b._df.number
-		vim.wo.relativenumber = b._df.relativenumber
-		vim.wo.signcolumn = b._df.signcolumn
-		vim.o.showmode = b._df.showmode
-		vim.o.laststatus = b._df.laststatus
-		vim.o.cmdheight = b._df.cmdheight
-		vim.cmd("setlocal scrolloff&")
-		b._df = nil
-	end
-end
-
-vim.keymap.set("n", "<leader>zz", toggle_distraction_free, { desc = "Toggle distraction-free" })
