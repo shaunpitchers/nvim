@@ -48,7 +48,7 @@ map("n", "<leader>gc", "<cmd>Git commit<CR>", { desc = "Git commit" })
 map("n", "<leader>gp", "<cmd>Git push<CR>", { desc = "Git push" })
 map("n", "<leader>gP", "<cmd>Git pull<CR>", { desc = "Git pull" })
 map("n", "<leader>gb", "<cmd>Git blame<CR>", { desc = "Git blame" })
-map("n", "<leader>gr", "<cmd>Gread<CR>", { desc = "Git revert to HEAD" })
+map("n", "<leader>gr", "<cmd>Gread<CR>", { desc = "Git read file" })
 map("n", "<leader>gw", "<cmd>Gwrite<CR>", { desc = "Git stage file" })
 
 --------------
@@ -59,19 +59,11 @@ map("n", "<leader>e", ":Lexplore<CR>", { desc = "Open File Explorer" })
 map("n", "<leader>sf", ":Files<CR>", { desc = "Fuzzy Find" })
 map("n", "<leader>sg", ":Rg<CR>", { desc = "Live Grep" })
 
--- Macro management
-map("n", "<leader>ql", "<cmd>reg<CR>", { desc = "List macros (registers)" })
-
-map("n", "<leader>qe", function()
-	local r = vim.fn.nr2char(vim.fn.getchar())
-	vim.fn.setreg(r, "")
-	print("Cleared register @" .. r)
-end, { desc = "Clear register (press register key)" })
-
--- scp netrw connection to workstation84
-map("n", "<leader>W", function()
-	vim.cmd("edit scp://workstation84//")
-end, { desc = "Browse workstation84 via scp (netrw)" })
+-- scp netrw connection to workstation84.
+-- Re-enable this if the remote browse workflow becomes regular again.
+-- map("n", "<leader>W", function()
+-- 	vim.cmd("edit scp://workstation84//")
+-- end, { desc = "Browse workstation84 via scp (netrw)" })
 
 --------------
 --Extra Vim magic
