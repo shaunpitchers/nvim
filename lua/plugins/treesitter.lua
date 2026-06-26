@@ -38,6 +38,7 @@ return {
 				auto_install = true, -- installs missing parsers when you open a filetype
 				highlight = {
 					enable = true,
+					disable = { "markdown", "markdown_inline" },
 					additional_vim_regex_highlighting = false,
 				},
 				sync_install = false,

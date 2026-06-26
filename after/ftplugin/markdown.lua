@@ -5,6 +5,15 @@
 local U = require("core.utils")
 local B = require("core.build")
 
+-- Neovim 0.12's bundled markdown ftplugin starts Treesitter directly,
+-- bypassing nvim-treesitter's per-filetype disable list. Stop it here.
+pcall(vim.treesitter.stop, 0)
+vim.opt_local.foldmethod = "manual"
+vim.opt_local.foldexpr = "0"
+U.bufunmap("n", "gO")
+U.bufunmap("n", "[[")
+U.bufunmap("n", "]]")
+
 -- Lazy-loaded Markdown plugins can cause the ftplugin to be re-applied.
 -- Neovim's bundled markdown.lua may emit E31 while undoing Treesitter maps.
 if vim.b.undo_ftplugin then
