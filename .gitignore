@@ -1,1 +1,2 @@
-# Keep lazy-lock.json tracked for reproducible plugin installs.
+# Personal config: let lazy.nvim update plugin pins locally without dirtying git.
+lazy-lock.json

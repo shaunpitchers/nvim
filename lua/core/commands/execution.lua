@@ -44,8 +44,28 @@ local function run_current()
 		bash = (vim.fn.executable(file) == 1 and vim.fn.shellescape(file) or ("bash " .. vim.fn.shellescape(file))),
 		zsh = (vim.fn.executable(file) == 1 and vim.fn.shellescape(file) or ("zsh " .. vim.fn.shellescape(file))),
 		javascript = "node " .. vim.fn.shellescape(file),
-		typescript = "node " .. vim.fn.shellescape(file),
 	}
+
+	if ft == "typescript" then
+		local spec = Tasks.just_spec("run")
+		if spec then
+			term("just run", spec.cwd)
+			return
+		end
+
+		if vim.fn.executable("tsx") == 1 then
+			term("tsx " .. vim.fn.shellescape(file), root)
+			return
+		end
+
+		if vim.fn.executable("ts-node") == 1 then
+			term("ts-node " .. vim.fn.shellescape(file), root)
+			return
+		end
+
+		vim.notify("No TypeScript runner found (add a just run recipe, or install tsx/ts-node)", vim.log.levels.WARN)
+		return
+	end
 
 	if ft == "c" or ft == "cpp" then
 		local out = vim.fn.expand("%:p:r") .. ".out"

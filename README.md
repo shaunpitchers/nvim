@@ -6,7 +6,7 @@ The config keeps the editor close to native Vim/Neovim behaviour while adding a 
 
 - project-aware build, run, test, and clean commands
 - writing ergonomics for Markdown, LaTeX, mail, and prose
-- lightweight LSP, completion, snippets, and Treesitter
+- lightweight LSP, linting, completion, snippets, and Treesitter
 - plugin-free defaults where built-ins are good enough
 - filetype-local actions through `<localleader>`
 
@@ -86,8 +86,9 @@ Global execution mappings:
 | `<leader>xr` | `:Run` |
 | `<leader>xo` | `:Open` |
 | `<leader>xt` | `:Test` |
+| `<leader>xl` | `:Lint` |
 
-Filetype-local mappings generally use:
+Filetype-local mappings use the subset that makes sense for that filetype:
 
 | Mapping | Action |
 | --- | --- |
@@ -96,6 +97,8 @@ Filetype-local mappings generally use:
 | `,o` | Open generated artifact or current file. |
 | `,c` | Clean generated files. |
 | `,t` | Test. |
+
+Markdown and LaTeX currently use `,b`, `,o`, and `,c`; LaTeX also uses `,v` for forward search. Python and C/C++ use the full build/run/open/test/clean set.
 
 ### Supported Workflows
 
@@ -108,6 +111,7 @@ Filetype-local mappings generally use:
 | Rust | `cargo build`, `cargo run`, `cargo test`, `cargo clean`. |
 | Go | `go build`, `go run`, `go test`, `go clean`. |
 | Shell | `:Build` uses shellcheck if available, `:Test` uses bats if available. |
+| TypeScript | `:Run` prefers `just run`, then `tsx`, then `ts-node`; it no longer tries to run `.ts` files directly with `node`. |
 | justfile projects | `just build`, `just run`, `just test`, `just clean` when recipes exist. |
 
 ### Build On Save
@@ -154,6 +158,7 @@ Useful writing commands:
 Code and config buffers get:
 
 - LSP diagnostics without inline virtual text
+- nvim-lint diagnostics on save for installed command-line linters
 - document highlights on cursor hold when supported by the server
 - LSP format-on-save where supported, excluding Markdown and TeX
 - trailing whitespace trimming on save
@@ -169,6 +174,7 @@ Useful commands:
 | `:Diagnostics!` | Open diagnostics in quickfix. |
 | `:ToggleFormatOnSave` | Toggle LSP format-on-save for the current buffer. |
 | `:ToggleInlayHints` | Toggle LSP inlay hints for the current buffer. |
+| `:Lint` | Run nvim-lint for the current buffer. |
 | `:Scratch` | Open a throwaway nofile buffer. |
 
 ## LSP Mappings
@@ -221,7 +227,7 @@ Markdown files inside a `zettelkasten` tree get small helpers from `core.zk`:
 
 ## Snippets
 
-Completion uses `nvim-cmp` and `LuaSnip`.
+Completion uses `nvim-cmp` and `LuaSnip`. Only local Lua snippets are loaded; the external `friendly-snippets` collection is intentionally not used.
 
 Local snippets live in:
 
@@ -231,7 +237,7 @@ snippets/
 
 Supported local snippet filetypes:
 
-- `tex`
+- `tex` / `latex`
 - `markdown`
 - `html`
 - `css`
@@ -243,6 +249,36 @@ Supported local snippet filetypes:
 - `ripgrep` powers `:grep` through `grepprg`.
 - netrw remains the file explorer.
 - `:Leader` and `:LocalLeader` provide lightweight mapping help without which-key.
+
+## Remote And Network Editing
+
+Neovim can edit remote files through netrw using SSH-backed URLs. This is useful for quick edits on a machine you can already SSH into:
+
+```vim
+:edit scp://workstation//home/shaun/path/to/file
+:Lexplore scp://workstation//home/shaun/
+```
+
+You can also open an SSH shell inside Neovim with:
+
+```vim
+:terminal ssh workstation
+```
+
+What works well:
+
+- quick remote file edits over `scp://` or `sftp://`
+- browsing a remote directory with netrw
+- keeping a remote shell beside local buffers in `:terminal`
+- copying remote file contents into a local buffer with netrw-style reads
+
+What does not work like a full remote IDE:
+
+- LSP, grep, build, test, and format commands still run locally unless you start Neovim on the remote host or mount/sync the project.
+- Remote netrw editing copies files back and forth; it is not a live remote project session.
+- Plugins that expect a local project tree may not understand a one-off remote file path.
+
+For serious remote project work, the reliable options are still: SSH into the machine and run `nvim` there, mount the project with `sshfs`, or sync the project locally and use this config against the local copy.
 
 ## Backups And Undo
 
@@ -267,6 +303,16 @@ Core tools:
 - `git`
 - `ripgrep`
 - `fzf`
+
+Optional lint tools are detected automatically when installed:
+
+- `shellcheck` for shell scripts
+- `zsh` for zsh syntax checks
+- `luac` for Lua syntax checks
+- `markdownlint-cli2` or `markdownlint` for Markdown
+- `chktex` for TeX/LaTeX
+- `yamllint` for YAML
+- `hadolint` for Dockerfiles
 
 Recommended by workflow:
 
@@ -294,13 +340,14 @@ Neovim health checks are handled by the normal:
 Plugins are kept small and purposeful:
 
 - LSP: `mason.nvim`, `mason-lspconfig.nvim`, `nvim-lspconfig`
+- Linting: `nvim-lint`
 - Completion: `nvim-cmp`, LuaSnip, cmp sources
 - Syntax: `nvim-treesitter`, `rainbow-delimiters.nvim`
 - Search: fzf/fzf.vim
 - Git: vim-fugitive
 - Editing: vim-surround, vim-sleuth, nvim-autopairs
 
-`lazy-lock.json` is tracked so plugin versions are reproducible.
+`lazy-lock.json` is ignored for this personal config so local plugin updates do not dirty git.
 
 ## Design Goal
 

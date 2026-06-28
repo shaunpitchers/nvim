@@ -79,6 +79,7 @@ map("n", "<leader>xb", "<cmd>Build<CR>", { desc = "Execute: build" })
 map("n", "<leader>xr", "<cmd>Run<CR>", { desc = "Execute: run" })
 map("n", "<leader>xo", "<cmd>Open<CR>", { desc = "Execute: open" })
 map("n", "<leader>xt", "<cmd>Test<CR>", { desc = "Execute: test" })
+map("n", "<leader>xl", "<cmd>Lint<CR>", { desc = "Execute: lint" })
 
 ------------
 ---Writing

@@ -40,6 +40,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	-- Core functionality
 	{ import = "plugins.lsp" },
+	{ import = "plugins.lint" },
 	{ import = "plugins.cmp" },
 
 	-- Search/navigation

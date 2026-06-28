@@ -4,6 +4,16 @@
 
 Markdown Treesitter is disabled as a workaround for a Neovim 0.12 runtime issue.
 
+Retested on 2026-06-28 with Neovim 0.12.3:
+
+- `README.md` still reproduces the Treesitter decoration provider error when
+  Markdown Treesitter is manually started.
+- `~/docs/guides/vim-surround-cheat-sheet.md` still reproduces the same error.
+- `docs/vim_refactor_fugitive_cheatsheet.md` did not reproduce the error in a
+  headless manual-start test.
+- All Lua files in this config opened with Treesitter active and no reproduced
+  Treesitter highlighter error.
+
 The failure seen when opening some Markdown files was:
 
 ```text
@@ -59,6 +69,42 @@ The following Markdown Treesitter features are disabled:
 - Treesitter Markdown folding.
 - Treesitter-based Markdown outline with `gO`.
 - Treesitter-based heading jumps with `[[` and `]]`.
+
+## What Treesitter Provides Here
+
+Treesitter parses code and prose into syntax trees instead of only matching text
+with regexes. In this config it mainly gives:
+
+- More accurate syntax highlighting for programming languages.
+- Better nested-language handling, such as code blocks or injected languages.
+- Structural editor features that can understand syntax nodes rather than plain
+  lines.
+- Plugin support for features such as rainbow delimiters.
+- Filetype-specific folding and navigation where Neovim or plugins wire those
+  features to Treesitter.
+
+For Lua coding, the important active pieces are Treesitter highlighting and
+rainbow delimiter support. LSP still handles diagnostics, completion, hover,
+rename, and most semantic code intelligence.
+
+For Markdown writing, Treesitter would mostly improve highlighting, fenced-code
+handling, heading structure, outline/navigation maps, and folding. The normal
+writing features are not dependent on it.
+
+## Features Causing The Issue
+
+The failing feature is the Treesitter highlighter decoration provider. The error
+is raised while Neovim parses/highlights Markdown:
+
+- `vim.treesitter.start()` starts the highlighter for the buffer.
+- The highlighter parses Markdown plus injected regions, including
+  `markdown_inline`.
+- During decoration/highlighting, Neovim hits a language-tree range failure:
+  `attempt to call method 'range' (a nil value)`.
+
+The workaround only disables Markdown Treesitter startup, folding, and
+Treesitter-provided Markdown heading maps. It does not disable Lua Treesitter or
+Treesitter for other coding filetypes.
 
 ## Functionality Still Available
 

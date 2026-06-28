@@ -9,7 +9,6 @@ return {
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
 			"saadparwaiz1/cmp_luasnip",
-			"onsails/lspkind.nvim",
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -59,20 +58,6 @@ return {
 					{ name = "buffer" },
 					{ name = "path" },
 				}),
-
-				formatting = {
-					format = require("lspkind").cmp_format({
-						mode = "symbol_text",
-						maxwidth = 50,
-						ellipsis_char = "...",
-						menu = {
-							buffer = "[Buffer]",
-							nvim_lsp = "[LSP]",
-							path = "[Path]",
-							luasnip = "[Snip]",
-						},
-					}),
-				},
 			})
 
 			-- Completion for / and ? (search)
@@ -84,10 +69,7 @@ return {
 			-- Completion for : (command line)
 			cmp.setup.cmdline(":", {
 				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources(
-					{ { name = "path" } },
-					{ { name = "cmdline" } }
-				),
+				sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
 				matching = { disallow_symbol_nonprefix_matching = false },
 			})
 		end,
@@ -98,15 +80,12 @@ return {
 		"L3MON4D3/LuaSnip",
 		ft = { "tex", "plaintex", "markdown", "html", "css", "python" },
 		build = "make install_jsregexp",
-		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
 			local luasnip = require("luasnip")
 			luasnip.config.set_config({
 				history = true,
 				updateevents = "TextChanged,TextChangedI",
 			})
-
-			require("luasnip.loaders.from_vscode").lazy_load()
 
 			require("luasnip.loaders.from_lua").lazy_load({
 				paths = { vim.fn.stdpath("config") .. "/snippets" },
