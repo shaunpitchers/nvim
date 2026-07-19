@@ -44,7 +44,7 @@ require("lazy").setup({
 	{ import = "plugins.cmp" },
 
 	-- Search/navigation
-	{ import = "plugins.treesitter" },
+	-- { import = "plugins.treesitter" },
 	{ import = "plugins.search" },
 
 	-- Editor enhancements
